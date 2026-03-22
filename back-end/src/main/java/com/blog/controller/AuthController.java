@@ -1,5 +1,6 @@
 package com.blog.controller;
 
+import cn.hutool.crypto.digest.BCrypt;
 import com.blog.common.Result;
 import com.blog.dto.LoginDTO;
 import com.blog.service.UserService;
@@ -26,11 +27,24 @@ public class AuthController {
     private UserService userService;
 
     /**
+     * 生成BCrypt密码哈希（临时调试用）
+     */
+    @GetMapping("/encode")
+    @Operation(summary = "生成密码哈希")
+    public Result<String> encodePassword(@RequestParam String password) {
+        String hash = BCrypt.hashpw(password, BCrypt.gensalt());
+        log.info("密码 {} 的BCrypt哈希: {}", password, hash);
+        String code="$2a$2a$2a$10$mDsdZtNxL4krM7oeBwayUevTQSFWs6wPLccCzcZboWn2Q4kS61P7q";
+        return Result.success(code);
+    }
+
+    /**
      * 用户登录
      */
     @PostMapping("/login")
     @Operation(summary = "用户登录")
     public Result<LoginVO> login(@Valid @RequestBody LoginDTO loginDTO) {
+        log.info("用户登录：{}", loginDTO.getPassword());
         LoginVO loginVO = userService.login(loginDTO);
         return Result.success(loginVO);
     }

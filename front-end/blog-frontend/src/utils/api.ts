@@ -60,7 +60,7 @@ async function request<T>(
       defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
   }
-
+  console.log(`${API_BASE_URL}${url}`)
   const response = await fetch(`${API_BASE_URL}${url}`, {
     ...options,
     headers: {

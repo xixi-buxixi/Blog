@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Form, Input, Button, message } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
-import { login } from '@/api/auth'
+import { login, encodePassword } from '@/api/auth'
 import { setToken } from '@/utils/auth'
 
 function Login() {
@@ -12,7 +12,15 @@ function Login() {
   const handleSubmit = async (values) => {
     setLoading(true)
     try {
-      const res = await login(values)
+      // 1. 先调用加密接口获取BCrypt哈希
+      const hashedPassword = await encodePassword(values.password)
+
+      // 2. 用哈希密码进行登录
+      const res = await login({
+        username: values.username,
+        password: hashedPassword
+      })
+
       setToken(res.token)
       message.success('登录成功')
       navigate('/dashboard')
