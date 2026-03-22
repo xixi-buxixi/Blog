@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.ArticleMapper">
+
+    <resultMap id="BaseResultMap" type="com.blog.entity.Article">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="summary" property="summary"/>
+        <result column="content" property="content"/>
+        <result column="cover_image" property="coverImage"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="author_id" property="authorId"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <!-- 文章列表VO映射 -->
+    <resultMap id="ArticleListVOMap" type="com.blog.vo.ArticleListVO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="summary" property="summary"/>
+        <result column="cover_image" property="coverImage"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="author_name" property="authorName"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 文章详情VO映射 -->
+    <resultMap id="ArticleVOMap" type="com.blog.vo.ArticleVO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="summary" property="summary"/>
+        <result column="content" property="content"/>
+        <result column="cover_image" property="coverImage"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="author_id" property="authorId"/>
+        <result column="author_name" property="authorName"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 分页查询文章列表 -->
+    <select id="selectArticleList" resultMap="ArticleListVOMap">
+        SELECT
+            a.id,
+            a.title,
+            a.summary,
+            a.cover_image,
+            a.category_id,
+            c.name AS category_name,
+            u.nickname AS author_name,
+            a.view_count,
+            a.status,
+            a.create_time
+        FROM t_article a
+        LEFT JOIN t_category c ON a.category_id = c.id
+        LEFT JOIN t_user u ON a.author_id = u.id
+        WHERE a.deleted = 0
+        <if test="categoryId != null">
+            AND a.category_id = #{categoryId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (a.title LIKE CONCAT('%', #{keyword}, '%')
+                 OR a.summary LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+        ORDER BY a.create_time DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <!-- 统计文章数量 -->
+    <select id="countArticle" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM t_article
+        WHERE deleted = 0
+        <if test="categoryId != null">
+            AND category_id = #{categoryId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (title LIKE CONCAT('%', #{keyword}, '%')
+                 OR summary LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+    </select>
+
+    <!-- 查询文章详情 -->
+    <select id="selectArticleById" resultMap="ArticleVOMap">
+        SELECT
+            a.id,
+            a.title,
+            a.summary,
+            a.content,
+            a.cover_image,
+            a.category_id,
+            c.name AS category_name,
+            a.author_id,
+            u.nickname AS author_name,
+            a.view_count,
+            a.status,
+            a.create_time,
+            a.update_time
+        FROM t_article a
+        LEFT JOIN t_category c ON a.category_id = c.id
+        LEFT JOIN t_user u ON a.author_id = u.id
+        WHERE a.id = #{id} AND a.deleted = 0
+    </select>
+
+    <!-- 增加浏览量 -->
+    <update id="incrementViewCount">
+        UPDATE t_article
+        SET view_count = view_count + 1
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+</mapper>
