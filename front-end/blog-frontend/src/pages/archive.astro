@@ -1,0 +1,171 @@
+---
+// 归档页 - 按时间归档文章
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { archiveApi, articleApi, type Article } from '../utils/api';
+
+// 获取归档数据
+// 由于后端可能还没有归档接口，这里使用文章列表模拟
+interface ArchiveGroup {
+  year: number;
+  months: {
+    month: number;
+    articles: Article[];
+  }[];
+}
+
+let archiveData: ArchiveGroup[] = [];
+
+try {
+  // 获取所有文章进行归档
+  const res = await articleApi.getList({ page: 1, pageSize: 100 });
+  const articles = res.data.list;
+
+  // 按年月分组
+  const groupedByYear = articles.reduce((acc, article) => {
+    const date = new Date(article.createTime);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+
+    if (!acc[year]) {
+      acc[year] = {};
+    }
+    if (!acc[year][month]) {
+      acc[year][month] = [];
+    }
+    acc[year][month].push(article);
+
+    return acc;
+  }, {} as Record<number, Record<number, Article[]>>);
+
+  // 转换为数组并排序
+  archiveData = Object.keys(groupedByYear)
+    .map(Number)
+    .sort((a, b) => b - a)
+    .map(year => ({
+      year,
+      months: Object.keys(groupedByYear[year])
+        .map(Number)
+        .sort((a, b) => b - a)
+        .map(month => ({
+          month,
+          articles: groupedByYear[year][month]
+        }))
+    }));
+} catch (error) {
+  console.error('Failed to fetch archive data:', error);
+}
+
+// 格式化日期
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('zh-CN', {
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+---
+
+<Layout title="归档 - My Blog">
+  <Header currentPath="/archive" />
+
+  <main class="flex-1 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+      <!-- 页面标题 -->
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">文章归档</h1>
+        <p class="text-gray-500 mt-1">按时间浏览所有文章</p>
+      </div>
+
+      <!-- 时间线 -->
+      {archiveData.length > 0 ? (
+        <div class="space-y-8">
+          {archiveData.map((yearGroup) => (
+            <div class="relative">
+              <!-- 年份标记 -->
+              <div class="flex items-center mb-4">
+                <span class="text-2xl font-bold text-primary-600">{yearGroup.year}</span>
+                <span class="ml-2 text-sm text-gray-400">
+                  {yearGroup.months.reduce((sum, m) => sum + m.articles.length, 0)} 篇文章
+                </span>
+              </div>
+
+              <!-- 月份列表 -->
+              <div class="space-y-6">
+                {yearGroup.months.map((monthGroup) => (
+                  <div class="relative pl-8 before:absolute before:left-3 before:top-0 before:bottom-0 before:w-px before:bg-gray-200">
+                    <!-- 月份标记 -->
+                    <div class="absolute left-0 top-0 w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
+                      <div class="w-2 h-2 bg-primary-500 rounded-full"></div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                      {monthNames[monthGroup.month - 1]}
+                      <span class="text-sm font-normal text-gray-400 ml-2">{monthGroup.articles.length} 篇</span>
+                    </h3>
+
+                    <!-- 文章列表 -->
+                    <div class="space-y-2">
+                      {monthGroup.articles.map((article) => (
+                        <a
+                          href={`/article/${article.id}`}
+                          class="block bg-white rounded-lg border border-gray-100 p-4 hover:shadow-md hover:border-primary-100 transition-all"
+                        >
+                          <div class="flex items-start justify-between">
+                            <div class="flex-1 min-w-0">
+                              <h4 class="text-gray-900 font-medium hover:text-primary-600 transition-colors truncate">
+                                {article.title}
+                              </h4>
+                              {article.summary && (
+                                <p class="text-gray-500 text-sm mt-1 line-clamp-1">{article.summary}</p>
+                              )}
+                              <div class="flex items-center mt-2 text-xs text-gray-400 space-x-3">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded bg-primary-50 text-primary-600">
+                                  {article.categoryName}
+                                </span>
+                                <span class="flex items-center">
+                                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                  </svg>
+                                  {article.viewCount}
+                                </span>
+                              </div>
+                            </div>
+                            <time class="text-sm text-gray-400 ml-4 flex-shrink-0">
+                              {formatDate(article.createTime)}
+                            </time>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div class="bg-white rounded-xl border border-gray-100 p-12 text-center">
+          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <p class="text-gray-500">暂无归档数据</p>
+        </div>
+      )}
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
