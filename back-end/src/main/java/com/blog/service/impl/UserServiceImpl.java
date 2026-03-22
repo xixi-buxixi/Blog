@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // 验证密码
-        if (!BCrypt.checkpw(loginDTO.getPassword(), user.getPassword())) {
+        if (!loginDTO.getPassword().equals(user.getPassword())) {
             throw new BusinessException("用户名或密码错误");
         }
 

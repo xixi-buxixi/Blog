@@ -67,8 +67,9 @@ CREATE TABLE t_article (
 
 -- 插入默认管理员账号
 -- 密码为: your_admin_password (BCrypt加密后的值)
+-- 使用 hutool BCrypt.hashpw("your_admin_password", BCrypt.gensalt()) 生成
 INSERT INTO t_user (username, password, nickname, role) VALUES
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', '管理员', 'ADMIN');
+('admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '管理员', 'ADMIN');
 
 -- 插入默认分类
 INSERT INTO t_category (name, description, sort_order) VALUES
