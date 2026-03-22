@@ -1,0 +1,109 @@
+---
+// Pagination 组件 - 分页
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+}
+
+const { currentPage, totalPages, baseUrl } = Astro.props;
+
+// 生成页码数组
+const getPageNumbers = () => {
+  const pages: (number | string)[] = [];
+
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    if (currentPage <= 3) {
+      pages.push(1, 2, 3, 4, '...', totalPages);
+    } else if (currentPage >= totalPages - 2) {
+      pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+    } else {
+      pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+    }
+  }
+
+  return pages;
+};
+
+const buildUrl = (page: number) => {
+  const url = new URL(baseUrl, 'http://example.com');
+  url.searchParams.set('page', String(page));
+  return url.pathname + url.search;
+};
+
+const pageNumbers = getPageNumbers();
+---
+
+{totalPages > 1 && (
+  <nav class="flex items-center justify-center space-x-1" aria-label="分页导航">
+    <!-- 上一页 -->
+    {currentPage > 1 ? (
+      <a
+        href={buildUrl(currentPage - 1)}
+        class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors"
+      >
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        上一页
+      </a>
+    ) : (
+      <span class="flex items-center px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-lg cursor-not-allowed">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        上一页
+      </span>
+    )}
+
+    <!-- 页码 -->
+    <div class="hidden sm:flex items-center space-x-1">
+      {pageNumbers.map((page) => (
+        typeof page === 'number' ? (
+          <a
+            href={buildUrl(page)}
+            class={`px-3.5 py-2 text-sm font-medium rounded-lg border transition-colors ${
+              page === currentPage
+                ? 'bg-primary-500 text-white border-primary-500'
+                : 'text-gray-600 bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+            }`}
+            aria-current={page === currentPage ? 'page' : undefined}
+          >
+            {page}
+          </a>
+        ) : (
+          <span class="px-2 py-2 text-gray-400">...</span>
+        )
+      ))}
+    </div>
+
+    <!-- 当前页/总页数 (移动端) -->
+    <span class="sm:hidden px-3 py-2 text-sm text-gray-600">
+      {currentPage} / {totalPages}
+    </span>
+
+    <!-- 下一页 -->
+    {currentPage < totalPages ? (
+      <a
+        href={buildUrl(currentPage + 1)}
+        class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors"
+      >
+        下一页
+        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    ) : (
+      <span class="flex items-center px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-lg cursor-not-allowed">
+        下一页
+        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+    )}
+  </nav>
+)}

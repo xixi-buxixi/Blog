@@ -1,0 +1,110 @@
+---
+// 首页 - 文章列表展示
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import Pagination from '../components/Pagination.astro';
+import { articleApi, categoryApi, type Article, type Category } from '../utils/api';
+
+// 获取查询参数
+const url = new URL(Astro.request.url);
+const page = parseInt(url.searchParams.get('page') || '1');
+const categoryId = url.searchParams.get('category') ? parseInt(url.searchParams.get('category')!) : undefined;
+const pageSize = 10;
+
+// 获取文章列表和分类列表
+// 注意：在 SSR 模式下这里会调用真实 API
+// 静态生成模式下需要使用 mock 数据或 API
+let articles: Article[] = [];
+let categories: Category[] = [];
+let total = 0;
+let totalPages = 1;
+
+try {
+  // 调用 API 获取数据
+  const [articlesRes, categoriesRes] = await Promise.all([
+    articleApi.getList({ page, pageSize, categoryId }),
+    categoryApi.getList()
+  ]);
+  articles = articlesRes.data.list;
+  total = articlesRes.data.total;
+  totalPages = articlesRes.data.totalPages;
+  categories = categoriesRes.data;
+} catch (error) {
+  console.error('Failed to fetch data:', error);
+}
+
+// 当前选中的分类
+const selectedCategory = categoryId ? categories.find(c => c.id === categoryId) : null;
+---
+
+<Layout title={selectedCategory ? `${selectedCategory.name} - My Blog` : 'My Blog'}>
+  <Header currentPath={Astro.url.pathname} />
+
+  <main class="flex-1 bg-gray-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+      <!-- 分类筛选 -->
+      <div class="mb-8">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-sm font-medium text-gray-500 mr-2">分类：</span>
+          <a
+            href="/"
+            class={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              !categoryId
+                ? 'bg-primary-500 text-white'
+                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+            }`}
+          >
+            全部
+          </a>
+          {categories.map((category) => (
+            <a
+              href={`/?category=${category.id}`}
+              class={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                categoryId === category.id
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+              }`}
+            >
+              {category.name}
+              <span class="ml-1 text-xs opacity-70">({category.articleCount})</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- 文章列表 -->
+      {articles.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {articles.map((article) => (
+            <ArticleCard article={article} />
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-16">
+          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p class="text-gray-500">暂无文章</p>
+          {!categoryId && (
+            <p class="text-gray-400 text-sm mt-2">请检查后端服务是否正常运行</p>
+          )}
+        </div>
+      )}
+
+      <!-- 分页 -->
+      {totalPages > 1 && (
+        <div class="mt-8">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            baseUrl={categoryId ? `/?category=${categoryId}` : '/'}
+          />
+        </div>
+      )}
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
