@@ -1,0 +1,126 @@
+---
+// 分类页 - 分类列表及按分类查看文章
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Pagination from '../../components/Pagination.astro';
+import { categoryApi, articleApi, type Category, type Article } from '../../utils/api';
+
+// 获取分类 ID（如果有）
+const { id } = Astro.params;
+const categoryId = id ? parseInt(id) : undefined;
+
+// 获取查询参数
+const url = new URL(Astro.request.url);
+const page = parseInt(url.searchParams.get('page') || '1');
+const pageSize = 10;
+
+// 获取数据
+let categories: Category[] = [];
+let articles: Article[] = [];
+let total = 0;
+let totalPages = 1;
+let selectedCategory: Category | null = null;
+
+try {
+  const [categoriesRes, articlesRes] = await Promise.all([
+    categoryApi.getList(),
+    categoryId ? articleApi.getList({ page, pageSize, categoryId }) : { data: { list: [], total: 0, page: 1, pageSize: 10, totalPages: 1 } }
+  ]);
+  categories = categoriesRes.data;
+  articles = articlesRes.data.list;
+  total = articlesRes.data.total;
+  totalPages = articlesRes.data.totalPages;
+  selectedCategory = categoryId ? categories.find(c => c.id === categoryId) || null : null;
+} catch (error) {
+  console.error('Failed to fetch data:', error);
+}
+---
+
+<Layout title={selectedCategory ? `${selectedCategory.name} - 分类 - My Blog` : '分类 - My Blog'}>
+  <Header currentPath="/category" />
+
+  <main class="flex-1 bg-gray-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+      <!-- 页面标题 -->
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">
+          {selectedCategory ? selectedCategory.name : '全部分类'}
+        </h1>
+        {selectedCategory?.description && (
+          <p class="text-gray-500">{selectedCategory.description}</p>
+        )}
+      </div>
+
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- 分类列表 -->
+        <aside class="lg:w-64 flex-shrink-0">
+          <div class="bg-white rounded-xl border border-gray-100 p-4">
+            <h2 class="text-sm font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+              分类列表
+            </h2>
+            <nav class="space-y-1">
+              <a
+                href="/category"
+                class={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  !categoryId
+                    ? 'bg-primary-50 text-primary-600'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <span>全部</span>
+              </a>
+              {categories.map((category) => (
+                <a
+                  href={`/category/${category.id}`}
+                  class={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    categoryId === category.id
+                      ? 'bg-primary-50 text-primary-600'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <span>{category.name}</span>
+                  <span class="text-xs text-gray-400">{category.articleCount}</span>
+                </a>
+              ))}
+            </nav>
+          </div>
+        </aside>
+
+        <!-- 文章列表 -->
+        <div class="flex-1">
+          {articles.length > 0 ? (
+            <>
+              <div class="grid grid-cols-1 gap-6">
+                {articles.map((article) => (
+                  <ArticleCard article={article} />
+                ))}
+              </div>
+
+              <!-- 分页 -->
+              {totalPages > 1 && (
+                <div class="mt-8">
+                  <Pagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    baseUrl={categoryId ? `/category/${categoryId}` : '/category'}
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            <div class="bg-white rounded-xl border border-gray-100 p-12 text-center">
+              <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p class="text-gray-500">该分类下暂无文章</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
