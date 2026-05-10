@@ -26,7 +26,7 @@ const Login: React.FC = () => {
         password: values.password,
       });
 
-      message.success('登录成功');
+      message.success('ACCESS GRANTED');
       // 后端返回 {token, userInfo, ...}
       setAuth(res.data.token, res.data.userInfo);
       navigate('/dashboard');
@@ -47,10 +47,10 @@ const Login: React.FC = () => {
       <Card className={styles.card}>
         <div className={styles.header}>
           <div className={styles.logo}>
-            <div className={styles.logoIcon}>B</div>
+            <div className={styles.logoIcon}>$</div>
           </div>
-          <h1 className={styles.title}>Blog Admin</h1>
-          <p className={styles.subtitle}>后台管理系统</p>
+          <h1 className={styles.title}>SYS.LOG</h1>
+          <p className={styles.subtitle}>CONTROL PANEL</p>
         </div>
 
         <Form
@@ -62,22 +62,22 @@ const Login: React.FC = () => {
         >
           <Form.Item
             name="username"
-            rules={[{ required: true, message: '请输入用户名' }]}
+            rules={[{ required: true, message: 'USERNAME REQUIRED' }]}
           >
             <Input
               prefix={<UserOutlined className={styles.inputIcon} />}
-              placeholder="用户名"
+              placeholder="USERNAME"
               autoComplete="username"
             />
           </Form.Item>
 
           <Form.Item
             name="password"
-            rules={[{ required: true, message: '请输入密码' }]}
+            rules={[{ required: true, message: 'PASSWORD REQUIRED' }]}
           >
             <Input.Password
               prefix={<LockOutlined className={styles.inputIcon} />}
-              placeholder="密码"
+              placeholder="PASSWORD"
               autoComplete="current-password"
             />
           </Form.Item>
@@ -85,7 +85,7 @@ const Login: React.FC = () => {
           <Form.Item>
             <div className={styles.formExtra}>
               <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox>记住我</Checkbox>
+                <Checkbox>REMEMBER CREDENTIALS</Checkbox>
               </Form.Item>
             </div>
           </Form.Item>
@@ -98,7 +98,7 @@ const Login: React.FC = () => {
               block
               className={styles.submitBtn}
             >
-              登录
+              INITIALIZE LOGIN
             </Button>
           </Form.Item>
         </Form>

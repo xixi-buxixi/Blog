@@ -1,4 +1,4 @@
-/* 全局样式 */
+/* 全局样式 - SYS.LOG Style */
 
 /* 重置样式 */
 * {
@@ -10,11 +10,12 @@
 html,
 body {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-    'Noto Color Emoji';
+  font-family: 'Inter', 'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #09090b;
+  color: #e4e4e7;
 }
 
 #root {
@@ -28,16 +29,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #09090b;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: #27272a;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  background: #3f3f46;
 }
 
 /* Ant Design 样式覆盖 */
@@ -46,15 +47,14 @@ body {
 }
 
 .ant-card {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03),
-    0 1px 6px -1px rgba(0, 0, 0, 0.02),
-    0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  border: 1px solid #27272a;
+  background: #121214;
 }
 
 .ant-card:hover {
-  box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16),
-    0 3px 6px 0 rgba(0, 0, 0, 0.12),
-    0 5px 12px 4px rgba(0, 0, 0, 0.09);
+  box-shadow: 0 10px 15px -3px rgba(139, 92, 246, 0.1), 0 4px 6px -2px rgba(139, 92, 246, 0.05);
+  border-color: #3f3f46;
 }
 
 /* Markdown 编辑器样式 */
@@ -63,25 +63,31 @@ body {
 }
 
 .w-md-editor {
-  border: 1px solid #d9d9d9;
-  border-radius: 8px;
+  border: 1px solid #27272a !important;
+  border-radius: 4px !important;
   overflow: hidden;
+  background-color: #121214 !important;
+  color: #e4e4e7 !important;
 }
 
 .w-md-editor:focus-within {
-  border-color: #1890ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2) !important;
 }
 
 .w-md-editor-toolbar {
-  background: #fafafa;
-  border-bottom: 1px solid #f0f0f0;
+  background: #09090b !important;
+  border-bottom: 1px solid #27272a !important;
+}
+
+.w-md-editor-content {
+  background-color: #121214 !important;
 }
 
 /* Prose 镜像样式 (用于文章预览) */
 .prose {
   max-width: 100%;
-  color: #374151;
+  color: #a1a1aa;
   line-height: 1.75;
 }
 
@@ -89,7 +95,7 @@ body {
 .prose h2,
 .prose h3,
 .prose h4 {
-  color: #111827;
+  color: #e4e4e7;
   font-weight: 600;
   margin-top: 2em;
   margin-bottom: 0.75em;
@@ -113,24 +119,27 @@ body {
 }
 
 .prose a {
-  color: #1890ff;
+  color: #8b5cf6;
   text-decoration: none;
 }
 
 .prose a:hover {
   text-decoration: underline;
+  color: #a78bfa;
 }
 
 .prose code {
-  background-color: #f3f4f6;
+  background-color: #27272a;
   padding: 0.2em 0.4em;
   border-radius: 3px;
   font-size: 0.875em;
+  color: #e4e4e7;
 }
 
 .prose pre {
-  background-color: #1f2937;
-  border-radius: 8px;
+  background-color: #09090b;
+  border: 1px solid #27272a;
+  border-radius: 4px;
   padding: 1rem;
   overflow-x: auto;
 }
@@ -138,14 +147,17 @@ body {
 .prose pre code {
   background-color: transparent;
   padding: 0;
-  color: #e5e7eb;
+  color: #e4e4e7;
 }
 
 .prose blockquote {
-  border-left: 4px solid #1890ff;
+  border-left: 4px solid #8b5cf6;
   padding-left: 1rem;
-  color: #6b7280;
+  color: #71717a;
   font-style: italic;
+  background-color: rgba(139, 92, 246, 0.05);
+  padding: 0.5rem 1rem;
+  border-radius: 0 4px 4px 0;
 }
 
 .prose ul,
@@ -161,7 +173,8 @@ body {
 .prose img {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 4px;
+  border: 1px solid #27272a;
 }
 
 .prose table {
@@ -171,11 +184,12 @@ body {
 
 .prose th,
 .prose td {
-  border: 1px solid #e5e7eb;
+  border: 1px solid #27272a;
   padding: 0.75rem;
 }
 
 .prose th {
-  background-color: #f9fafb;
+  background-color: #18181b;
   font-weight: 600;
+  color: #e4e4e7;
 }

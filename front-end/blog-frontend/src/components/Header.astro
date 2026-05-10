@@ -7,9 +7,10 @@ interface Props {
 const { currentPath = '' } = Astro.props;
 
 const navItems = [
-  { href: '/', label: '/home' },
-  { href: '/category', label: '/category' },
-  { href: '/archive', label: '/archive' },
+  { href: '/', label: 'HOME' },
+  { href: '/archive', label: 'ARTICLES' },
+  { href: '/about', label: 'ABOUT' },
+  { href: '/search', label: 'SEARCH' },
 ];
 
 const isActive = (href: string) => {
@@ -18,58 +19,61 @@ const isActive = (href: string) => {
 };
 ---
 
-<nav class="fixed top-0 w-full z-50 glass border-b-0 px-6 py-4 flex justify-between items-center transition-transform duration-300" id="navbar">
-  <a href="/" class="font-display font-bold text-xl tracking-tight flex items-center gap-2 hover-trigger">
-    <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-    SYS<span class="text-primary">.LOG</span>
-  </a>
-  <div class="hidden md:flex font-mono text-sm gap-8 text-zinc-400">
-    {navItems.map((item) => (
-      <a
-        href={item.href}
-        class={`transition-colors hover-trigger ${
-          isActive(item.href)
-            ? 'text-white'
-            : 'hover:text-white'
-        }`}
-      >
-        {item.label}
-      </a>
-    ))}
-  </div>
-  <div class="flex items-center gap-4">
-    <a href="/search" class="text-zinc-400 hover:text-white hover-trigger flex items-center justify-center w-8 h-8 rounded-full bg-white/5 transition-colors">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+<nav class="sticky top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex justify-between items-center transition-transform duration-300" id="navbar">
+  <div class="flex items-center gap-12">
+    <a href="/" class="font-sans font-bold text-2xl tracking-tight text-slate-900">
+      TECH<span class="text-slate-400 font-light">::minimal</span>
     </a>
-    <button class="md:hidden text-zinc-400 hover:text-white hover-trigger" id="mobile-menu-btn" aria-label="Toggle Menu">
+    <div class="hidden md:flex font-sans text-sm font-medium gap-8 text-slate-500">
+      {navItems.map((item) => (
+        <a
+          href={item.href}
+          class={`transition-colors py-1 ${
+            isActive(item.href)
+              ? 'text-slate-900 border-b-2 border-slate-900'
+              : 'hover:text-slate-900'
+          }`}
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+  </div>
+  
+  <div class="flex items-center gap-4">
+    <!-- Dark Mode Toggle Switch (UI Only for now) -->
+    <button class="text-slate-500 hover:text-slate-900 transition-colors w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100" id="theme-toggle" aria-label="Toggle Dark Mode">
+      <!-- Sun icon -->
+      <svg id="theme-toggle-light-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+      <!-- Moon icon (hidden by default) -->
+      <svg id="theme-toggle-dark-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+    </button>
+    
+    <button class="md:hidden text-slate-500 hover:text-slate-900" id="mobile-menu-btn" aria-label="Toggle Menu">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
   </div>
 </nav>
 
 <!-- Mobile Navigation -->
-<div id="mobile-menu" class="hidden fixed inset-0 z-40 bg-background/95 backdrop-blur-xl pt-24 px-6 md:hidden">
-  <nav class="flex flex-col gap-6 font-mono text-lg">
+<div id="mobile-menu" class="hidden fixed inset-0 z-40 bg-white/95 backdrop-blur-xl pt-24 px-6 md:hidden">
+  <nav class="flex flex-col gap-6 font-sans font-medium text-lg text-slate-600">
     {navItems.map((item) => (
       <a
         href={item.href}
-        class={`block py-2 border-b border-white/10 hover-trigger ${
+        class={`block py-2 border-b border-slate-100 ${
           isActive(item.href)
-            ? 'text-white border-primary/50'
-            : 'text-zinc-400 hover:text-white'
+            ? 'text-slate-900'
+            : 'hover:text-slate-900'
         }`}
       >
         {item.label}
       </a>
     ))}
-    <form action="/search" method="get" class="relative mt-8">
-      <input
-        type="text"
-        name="q"
-        placeholder="Search..."
-        class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors hover-trigger placeholder:text-zinc-600 font-sans"
-      />
-    </form>
   </nav>
 </div>
 
@@ -116,12 +120,38 @@ const isActive = (href: string) => {
     };
   };
 
+  // Theme Toggle Logic
+  const initThemeToggle = () => {
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const darkIcon = document.getElementById('theme-toggle-dark-icon');
+    const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+    const toggleTheme = () => {
+      document.documentElement.classList.toggle('dark');
+      if (document.documentElement.classList.contains('dark')) {
+        darkIcon?.classList.remove('hidden');
+        lightIcon?.classList.add('hidden');
+      } else {
+        lightIcon?.classList.remove('hidden');
+        darkIcon?.classList.add('hidden');
+      }
+    };
+
+    themeToggleBtn?.addEventListener('click', toggleTheme);
+
+    return () => {
+      themeToggleBtn?.removeEventListener('click', toggleTheme);
+    };
+  };
+
   let cleanupMenu: (() => void) | undefined;
   let cleanupScroll: (() => void) | undefined;
+  let cleanupTheme: (() => void) | undefined;
 
   const init = () => {
     cleanupMenu = initMenu();
     cleanupScroll = initNavbarScroll();
+    cleanupTheme = initThemeToggle();
   };
 
   init();
@@ -129,6 +159,7 @@ const isActive = (href: string) => {
   document.addEventListener('astro:page-load', () => {
     if(cleanupMenu) cleanupMenu();
     if(cleanupScroll) cleanupScroll();
+    if(cleanupTheme) cleanupTheme();
     init();
   });
 </script>

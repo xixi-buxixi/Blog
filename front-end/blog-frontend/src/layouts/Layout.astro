@@ -5,11 +5,11 @@ interface Props {
   description?: string;
 }
 
-const { title = 'SYS.LOG | Engineering Blog', description = 'Deep dives into systems design, performance optimization, and the bleeding edge of web technologies.' } = Astro.props;
+const { title = 'TECH::minimal', description = 'Clean, bright, minimal aesthetic, code-first focus tech blog.' } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,84 +18,24 @@ const { title = 'SYS.LOG | Engineering Blog', description = 'Deep dives into sys
     <meta name="generator" content={Astro.generator} />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <title>{title}</title>
   </head>
-  <body class="min-h-screen flex flex-col relative antialiased">
-    <!-- Custom Cursor -->
-    <div id="cursor"></div>
-    <div id="cursor-dot"></div>
-
-    <!-- Background Ambient Glows -->
-    <div class="bg-blob w-[50vw] h-[50vw] bg-primary/20 rounded-full top-[-20vw] left-[-10vw] pointer-events-none fixed"></div>
-    <div class="bg-blob w-[40vw] h-[40vw] bg-secondary/20 rounded-full bottom-[10vw] right-[-10vw] pointer-events-none fixed"></div>
+  <body class="min-h-screen flex flex-col relative antialiased bg-white text-slate-800">
+    <!-- Subtle Geometric Lines Background -->
+    <div class="fixed inset-0 pointer-events-none z-[-1] opacity-20">
+      <svg class="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#cbd5e1" stroke-width="0.5" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid-pattern)" />
+      </svg>
+    </div>
     
     <slot />
 
-    <script>
-      // Custom Cursor Logic
-      const initCursor = () => {
-        const cursor = document.getElementById('cursor');
-        const cursorDot = document.getElementById('cursor-dot');
-        
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-        let cursorX = mouseX;
-        let cursorY = mouseY;
-        
-        const handleMouseMove = (e: MouseEvent) => {
-          mouseX = e.clientX;
-          mouseY = e.clientY;
-          
-          if(cursorDot) {
-            cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
-          }
-        };
-
-        document.addEventListener('mousemove', handleMouseMove);
-        
-        let animationFrameId: number;
-        const animate = () => {
-          cursorX += (mouseX - cursorX) * 0.15;
-          cursorY += (mouseY - cursorY) * 0.15;
-          
-          if(cursor) {
-            cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
-          }
-          
-          animationFrameId = requestAnimationFrame(animate);
-        };
-        animate();
-
-        // Hover effects
-        const updateHoverEffects = () => {
-          const hoverTriggers = document.querySelectorAll('.hover-trigger, .hover-target, a, button, input, textarea');
-          hoverTriggers.forEach(trigger => {
-            trigger.addEventListener('mouseenter', () => cursor?.classList.add('cursor-hover'));
-            trigger.addEventListener('mouseleave', () => cursor?.classList.remove('cursor-hover'));
-          });
-        };
-
-        updateHoverEffects();
-        
-        // Cleanup function for Astro view transitions
-        return () => {
-          document.removeEventListener('mousemove', handleMouseMove);
-          cancelAnimationFrame(animationFrameId);
-        };
-      };
-
-      let cleanup: (() => void) | undefined;
-      
-      // Initialize on load
-      cleanup = initCursor();
-      
-      // Re-initialize on view transitions
-      document.addEventListener('astro:page-load', () => {
-        if(cleanup) cleanup();
-        cleanup = initCursor();
-      });
-    </script>
   </body>
 </html>
 

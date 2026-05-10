@@ -5,23 +5,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#09090b',
-        surface: '#18181b',
-        surfaceHover: '#27272a',
+        background: '#ffffff',
+        surface: '#f9fafb',
+        surfaceHover: '#f3f4f6',
         primary: {
-          DEFAULT: '#8b5cf6',
-          50: '#f5f3ff',
-          100: '#ede9fe',
-          200: '#ddd6fe',
-          300: '#c4b5fd',
-          400: '#a78bfa',
-          500: '#8b5cf6',
-          600: '#7c3aed',
-          700: '#6d28d9',
-          800: '#5b21b6',
-          900: '#4c1d95',
+          DEFAULT: '#0f172a', // very dark blue/slate for primary actions
+          50: '#f8fafc',
+          100: '#f1f5f9',
+          200: '#e2e8f0',
+          300: '#cbd5e1',
+          400: '#94a3b8',
+          500: '#64748b',
+          600: '#475569',
+          700: '#334155',
+          800: '#1e293b',
+          900: '#0f172a',
         },
-        secondary: '#06b6d4', // Cyan
+        secondary: '#3b82f6', // blue for highlights/links
         gray: {
           50: '#f9fafb',
           100: '#f3f4f6',
@@ -36,32 +36,21 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['"Space Grotesk"', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
-        serif: ['"Space Grotesk"', 'sans-serif'], // Redirect serif to display for backward compatibility
+        serif: ['Lora', 'Merriweather', 'Georgia', 'serif'],
       },
       lineHeight: {
-        'relaxed': '1.75',
+        'relaxed': '1.8',
       },
       animation: {
-        'gradient-x': 'gradient-x 15s ease infinite',
         'float': 'float 6s ease-in-out infinite',
       },
       keyframes: {
-        'gradient-x': {
-          '0%, 100%': {
-            'background-size': '200% 200%',
-            'background-position': 'left center'
-          },
-          '50%': {
-            'background-size': '200% 200%',
-            'background-position': 'right center'
-          }
-        },
         'float': {
           '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-20px)' },
+          '50%': { transform: 'translateY(-10px)' },
         }
       }
     },
