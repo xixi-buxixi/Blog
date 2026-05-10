@@ -1,0 +1,178 @@
+name: Deploy to Servers
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      admin: ${{ steps.filter.outputs.admin }}
+      manager: ${{ steps.filter.outputs.manager }}
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'front-end/blog-frontend/**'
+            admin:
+              - 'front-end/blog-admin/**'
+            manager:
+              - 'manager-end/**'
+            backend:
+              - 'back-end/**'
+
+  deploy-frontend:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: front-end/blog-frontend/package-lock.json
+      - name: Build
+        run: cd front-end/blog-frontend && npm ci && npm run build
+      - name: Clean old dist on server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.TENCENT_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: rm -rf /var/www/blog/frontend/dist
+      - name: Upload dist + package files
+        uses: appleboy/scp-action@v0
+        with:
+          host: ${{ secrets.TENCENT_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: |
+            front-end/blog-frontend/dist
+            front-end/blog-frontend/package.json
+            front-end/blog-frontend/package-lock.json
+          target: /var/www/blog/frontend/
+          strip_components: 3
+      - name: Install deps + Restart
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.TENCENT_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/blog/frontend
+            npm install --production
+            npm install @rollup/rollup-linux-x64-gnu --save-optional 2>/dev/null || true
+            chmod -R 755 dist/
+            pm2 restart blog-frontend
+
+  deploy-admin:
+    needs: changes
+    if: ${{ needs.changes.outputs.admin == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: front-end/blog-admin/package-lock.json
+      - name: Build
+        run: cd front-end/blog-admin && npm ci && npm run build
+      - name: Clean old assets
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.TENCENT_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: rm -rf /var/www/blog/admin/assets /var/www/blog/admin/index.html /var/www/blog/admin/favicon.svg
+      - name: Upload to Tencent
+        uses: appleboy/scp-action@v0
+        with:
+          host: ${{ secrets.TENCENT_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: front-end/blog-admin/dist/*
+          target: /var/www/blog/admin/
+          strip_components: 3
+      - name: Fix permissions
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.TENCENT_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: chmod -R 755 /var/www/blog/admin/
+
+  deploy-manager:
+    needs: changes
+    if: ${{ needs.changes.outputs.manager == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: manager-end/package-lock.json
+      - name: Build
+        run: cd manager-end && npm ci && npm run build
+      - name: Clean old assets
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.TENCENT_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: rm -rf /var/www/blog/manager/assets /var/www/blog/manager/index.html
+      - name: Upload to Tencent
+        uses: appleboy/scp-action@v0
+        with:
+          host: ${{ secrets.TENCENT_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: manager-end/dist/*
+          target: /var/www/blog/manager/
+          strip_components: 2
+      - name: Fix permissions
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.TENCENT_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: chmod -R 755 /var/www/blog/manager/
+
+  deploy-backend:
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+          cache: maven
+      - name: Build
+        run: cd back-end && mvn clean package -DskipTests -B
+      - name: Upload jar to Qiniuyun
+        uses: appleboy/scp-action@v0
+        with:
+          host: ${{ secrets.QINIUYUN_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: back-end/target/blog-backend-1.0.0.jar
+          target: /opt/blog/
+          strip_components: 2
+      - name: Restart backend
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.QINIUYUN_HOST }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: pm2 restart blog-backend
