@@ -50,20 +50,20 @@ const author = {
 <Layout title={selectedCategory ? `${selectedCategory.name} - TECH::minimal` : 'TECH::minimal | Blog'}>
   <Header currentPath={Astro.url.pathname} />
 
-  <main class="max-w-6xl mx-auto px-6 pt-24 pb-20">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 sm:pb-20">
     
     <!-- Profile Section -->
-    <section class="mb-20 max-w-3xl">
-      <div class="flex items-center gap-6 mb-6">
-        <img src={author.avatar} alt={author.name} class="w-20 h-20 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm" />
+    <section class="mb-16 sm:mb-20 max-w-3xl">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mb-6">
+        <img src={author.avatar} alt={author.name} class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm" />
         <div>
-          <h1 class="text-3xl font-sans font-bold text-slate-900 dark:text-white">{author.name}</h1>
-          <p class="text-slate-500 dark:text-slate-400 font-sans text-lg">{author.bio}</p>
+          <h1 class="text-2xl sm:text-3xl font-sans font-bold text-slate-900 dark:text-white">{author.name}</h1>
+          <p class="text-slate-500 dark:text-slate-400 font-sans text-base sm:text-lg">{author.bio}</p>
         </div>
       </div>
       <div class="space-y-4">
         {author.paragraphs.map(p => (
-          <p class="text-slate-700 dark:text-slate-300 leading-relaxed font-serif text-lg">
+          <p class="text-slate-700 dark:text-slate-300 leading-relaxed font-serif text-base sm:text-lg">
             {p}
           </p>
         ))}
