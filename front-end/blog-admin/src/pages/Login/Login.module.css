@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #09090b;
   position: relative;
   overflow: hidden;
 }
@@ -15,13 +15,15 @@
   right: 0;
   bottom: 0;
   overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.05) 0%, rgba(9, 9, 11, 1) 100%);
 }
 
 .shape1,
 .shape2 {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(139, 92, 246, 0.1);
+  filter: blur(100px);
 }
 
 .shape1 {
@@ -40,10 +42,13 @@
 
 .card {
   width: 400px;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
   position: relative;
   z-index: 1;
+  background: rgba(18, 18, 20, 0.8) !important;
+  backdrop-filter: blur(20px);
+  border: none !important;
 }
 
 .header {
@@ -60,27 +65,34 @@
 .logoIcon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #2e1065 100%);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
+  font-family: 'JetBrains Mono', monospace;
   font-weight: bold;
   color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .title {
   font-size: 24px;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.85);
+  color: #e4e4e7;
   margin-bottom: 8px;
+  letter-spacing: 0.05em;
 }
 
 .subtitle {
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.45);
+  font-family: 'JetBrains Mono', monospace;
+  color: #a1a1aa;
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .form {
@@ -88,7 +100,7 @@
 }
 
 .inputIcon {
-  color: rgba(0, 0, 0, 0.25);
+  color: #71717a;
 }
 
 .formExtra {
@@ -99,12 +111,18 @@
 
 .submitBtn {
   height: 44px;
-  font-size: 16px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  border-radius: 4px;
+  background: #e4e4e7;
+  color: #09090b;
   border: none;
+  transition: all 0.3s ease;
 }
 
 .submitBtn:hover {
-  background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+  background: #8b5cf6;
+  color: #fff;
 }
