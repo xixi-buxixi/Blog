@@ -44,7 +44,7 @@ const pageNumbers = getPageNumbers();
     {currentPage > 1 ? (
       <a
         href={buildUrl(currentPage - 1)}
-        class="flex items-center px-4 py-2 text-sm text-zinc-400 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-colors hover-trigger"
+        class="flex items-center px-4 py-2 text-sm text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
       >
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -52,7 +52,7 @@ const pageNumbers = getPageNumbers();
         PREV
       </a>
     ) : (
-      <span class="flex items-center px-4 py-2 text-sm text-zinc-600 border border-white/5 rounded-xl cursor-not-allowed">
+      <span class="flex items-center px-4 py-2 text-sm text-slate-300 dark:text-slate-600 border border-slate-100 dark:border-slate-800 rounded-xl cursor-not-allowed">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
@@ -66,23 +66,23 @@ const pageNumbers = getPageNumbers();
         typeof page === 'number' ? (
           <a
             href={buildUrl(page)}
-            class={`w-10 h-10 flex items-center justify-center text-sm rounded-xl border transition-colors hover-trigger ${
+            class={`w-10 h-10 flex items-center justify-center text-sm rounded-xl border transition-colors ${
               page === currentPage
-                ? 'bg-primary/20 text-primary border-primary/50'
-                : 'text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white'
+                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white'
+                : 'text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
             }`}
             aria-current={page === currentPage ? 'page' : undefined}
           >
             {page}
           </a>
         ) : (
-          <span class="px-2 py-2 text-zinc-600">...</span>
+          <span class="px-2 py-2 text-slate-400 dark:text-slate-500">...</span>
         )
       ))}
     </div>
 
     <!-- 当前页/总页数 (移动端) -->
-    <span class="sm:hidden px-3 py-2 text-sm text-zinc-500">
+    <span class="sm:hidden px-3 py-2 text-sm text-slate-500 dark:text-slate-400">
       {currentPage} / {totalPages}
     </span>
 
@@ -90,7 +90,7 @@ const pageNumbers = getPageNumbers();
     {currentPage < totalPages ? (
       <a
         href={buildUrl(currentPage + 1)}
-        class="flex items-center px-4 py-2 text-sm text-zinc-400 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-colors hover-trigger"
+        class="flex items-center px-4 py-2 text-sm text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
       >
         NEXT
         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,7 +98,7 @@ const pageNumbers = getPageNumbers();
         </svg>
       </a>
     ) : (
-      <span class="flex items-center px-4 py-2 text-sm text-zinc-600 border border-white/5 rounded-xl cursor-not-allowed">
+      <span class="flex items-center px-4 py-2 text-sm text-slate-300 dark:text-slate-600 border border-slate-100 dark:border-slate-800 rounded-xl cursor-not-allowed">
         NEXT
         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

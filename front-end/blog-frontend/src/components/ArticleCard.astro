@@ -8,25 +8,10 @@ interface Props {
 }
 
 const { article, index = 0 } = Astro.props;
-
-// Fallback high quality Unsplash images if no cover
-const defaultImages = [
-  'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=1000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?q=80&w=1000&auto=format&fit=crop'
-];
-
-const imageSrc = article.coverImage || defaultImages[index % defaultImages.length];
-
 ---
 
 <a href={`/article/${article.id}`} class="block h-full group">
   <article class="flex flex-col h-full bg-white rounded-xl overflow-hidden hover:-translate-y-1 transition-all duration-300 border border-slate-200 hover:shadow-md">
-    <div class="relative h-48 overflow-hidden bg-slate-100">
-      <img src={imageSrc} alt={article.title} class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" loading="lazy">
-    </div>
     <div class="p-6 flex flex-col flex-1">
       <div class="flex items-center gap-3 mb-3">
         <span class="px-2.5 py-1 rounded-md text-xs font-sans font-semibold bg-slate-100 text-slate-600 uppercase tracking-wide">
