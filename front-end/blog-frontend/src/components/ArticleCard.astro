@@ -1,98 +1,66 @@
 ---
-// ArticleCard 组件 - Awwwards 风格卡片
+// ArticleCard 组件 - SYS.LOG 风格卡片
 import type { Article } from '../utils/api';
 
 interface Props {
   article: Article;
-  index: number;
+  index?: number;
 }
 
-const { article, index } = Astro.props;
+const { article, index = 0 } = Astro.props;
 
 // Fallback high quality Unsplash images if no cover
 const defaultImages = [
-  'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=2000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=2000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2000&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?q=80&w=2000&auto=format&fit=crop'
+  'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?q=80&w=1000&auto=format&fit=crop'
 ];
 
-const imageSrc = article.coverImage || defaultImages[(index || 0) % defaultImages.length];
+const imageSrc = article.coverImage || defaultImages[index % defaultImages.length];
+
+// Alternating accent colors based on index
+const themes = [
+  { border: 'hover:border-primary/30', shadow: 'hover:shadow-primary/20', bg: 'bg-primary/20', text: 'text-primary', fill: 'group-hover:bg-primary group-hover:text-white' },
+  { border: 'hover:border-secondary/30', shadow: 'hover:shadow-secondary/20', bg: 'bg-secondary/20', text: 'text-secondary', fill: 'group-hover:bg-secondary group-hover:text-black' },
+  { border: 'hover:border-white/30', shadow: 'hover:shadow-white/10', bg: 'bg-white/10', text: 'text-white', fill: 'group-hover:bg-white group-hover:text-black' }
+];
+
+const theme = themes[index % themes.length];
+const yOffset = index % 3 === 1 ? 'lg:-translate-y-6' : index % 3 === 2 ? 'lg:-translate-y-12' : '';
 ---
 
-<article class="portfolio-card relative w-full h-[60vh] md:h-[85vh] overflow-hidden group cursor-none mb-32 hover-target" data-tilt>
-  <a href={`/article/${article.id}`} class="block w-full h-full cursor-none">
-    <div class="card-inner w-full h-full transition-transform duration-200 ease-out preserve-3d">
-      <img
-        src={imageSrc}
-        alt={article.title}
-        class="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-700 ease-in-out scale-110"
-        loading="lazy"
-      />
-      <div class="absolute inset-0 bg-black/50 group-hover:bg-black/20 transition-colors duration-700 pointer-events-none"></div>
-      
-      <div class="absolute bottom-10 left-10 md:bottom-20 md:left-20 z-10 translate-z-10 transition-transform duration-700 group-hover:translate-x-10 group-hover:-translate-y-5 pointer-events-none">
-        <span class="text-primary-500 font-mono tracking-widest text-xs md:text-sm uppercase mb-4 md:mb-6 block">
-          {article.categoryName || 'Design'} — {new Date(article.createTime || Date.now()).getFullYear()}
+<a href={`/article/${article.id}`} class="block h-full hover-trigger">
+  <article class={`group relative flex flex-col h-full glass rounded-2xl overflow-hidden hover:-translate-y-2 transition-all duration-500 border border-white/5 ${theme.border} hover:shadow-lg ${theme.shadow} ${yOffset}`}>
+    <div class="relative h-48 overflow-hidden">
+      <div class={`absolute inset-0 ${theme.bg} group-hover:bg-transparent transition-colors duration-500 z-10 mix-blend-overlay`}></div>
+      <img src={imageSrc} alt={article.title} class={`w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ${index % 3 === 2 ? 'grayscale group-hover:grayscale-0' : ''}`} loading="lazy">
+    </div>
+    <div class="p-6 flex flex-col flex-1 relative z-20">
+      <div class="flex items-center gap-3 mb-4">
+        <span class={`px-2 py-1 rounded text-[10px] font-mono font-bold ${theme.bg} ${theme.text} uppercase tracking-wider`}>
+          {article.categoryName || 'Engineering'}
         </span>
-        <h2 class="font-serif text-5xl md:text-8xl text-white font-bold leading-none max-w-5xl tracking-tighter">
-          {article.title}
-        </h2>
+        <span class="text-zinc-500 text-xs font-mono flex items-center gap-1">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          {article.viewCount || 0}
+        </span>
+      </div>
+      <h3 class={`font-display text-xl font-bold mb-3 group-hover:${theme.text} transition-colors line-clamp-2`}>
+        {article.title}
+      </h3>
+      <p class="text-zinc-400 text-sm mb-6 flex-1 line-clamp-3 font-light">
+        {article.summary || 'No description provided.'}
+      </p>
+      <div class="flex items-center justify-between mt-auto pt-4 border-t border-white/10">
+        <span class="text-xs text-zinc-500 font-mono">
+          {new Date(article.createTime || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }).toUpperCase()}
+        </span>
+        <span class={`w-8 h-8 rounded-full bg-white/5 flex items-center justify-center transition-colors ${theme.fill}`}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </span>
       </div>
     </div>
-  </a>
-</article>
-
-<style>
-  .preserve-3d {
-    transform-style: preserve-3d;
-  }
-  .translate-z-10 {
-    transform: translateZ(80px);
-  }
-</style>
-
-<script>
-  // 3D Tilt Effect
-  const initTilt = () => {
-    const cards = document.querySelectorAll('.portfolio-card');
-    
-    cards.forEach((card) => {
-      const inner = card.querySelector('.card-inner') as HTMLElement;
-      
-      card.addEventListener('mousemove', (e: Event) => {
-        const evt = e as MouseEvent;
-        const rect = card.getBoundingClientRect();
-        const x = evt.clientX - rect.left;
-        const y = evt.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = ((y - centerY) / centerY) * -12; // Max rotation 12deg
-        const rotateY = ((x - centerX) / centerX) * 12;
-        
-        if (inner) {
-          inner.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-        }
-      });
-      
-      card.addEventListener('mouseleave', () => {
-        if (inner) {
-          inner.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-          inner.style.transition = 'transform 0.7s cubic-bezier(0.23, 1, 0.32, 1)';
-        }
-      });
-      
-      card.addEventListener('mouseenter', () => {
-        if (inner) {
-          inner.style.transition = 'transform 0.1s ease-out';
-        }
-      });
-    });
-  };
-
-  initTilt();
-  document.addEventListener('astro:page-load', initTilt);
-</script>
+  </article>
+</a>

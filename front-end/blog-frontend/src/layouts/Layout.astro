@@ -5,11 +5,11 @@ interface Props {
   description?: string;
 }
 
-const { title = 'My Blog', description = 'A personal blog built with Astro' } = Astro.props;
+const { title = 'SYS.LOG | Engineering Blog', description = 'Deep dives into systems design, performance optimization, and the bleeding edge of web technologies.' } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,68 +18,83 @@ const { title = 'My Blog', description = 'A personal blog built with Astro' } = 
     <meta name="generator" content={Astro.generator} />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <title>{title}</title>
   </head>
-  <body class="min-h-screen flex flex-col bg-white text-black relative">
+  <body class="min-h-screen flex flex-col relative antialiased">
     <!-- Custom Cursor -->
-    <div id="custom-cursor" class="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-primary-500 pointer-events-none z-[100] transition-transform duration-100 ease-out flex items-center justify-center mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
-    <div id="custom-cursor-dot" class="fixed top-0 left-0 w-2 h-2 bg-primary-500 rounded-full pointer-events-none z-[100]" style="transform: translate(-50%, -50%);"></div>
+    <div id="cursor"></div>
+    <div id="cursor-dot"></div>
+
+    <!-- Background Ambient Glows -->
+    <div class="bg-blob w-[50vw] h-[50vw] bg-primary/20 rounded-full top-[-20vw] left-[-10vw] pointer-events-none fixed"></div>
+    <div class="bg-blob w-[40vw] h-[40vw] bg-secondary/20 rounded-full bottom-[10vw] right-[-10vw] pointer-events-none fixed"></div>
     
     <slot />
 
     <script>
       // Custom Cursor Logic
-      const cursor = document.getElementById('custom-cursor');
-      const cursorDot = document.getElementById('custom-cursor-dot');
-      
-      let mouseX = -100;
-      let mouseY = -100;
-      
-      let cursorX = -100;
-      let cursorY = -100;
-      
-      document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+      const initCursor = () => {
+        const cursor = document.getElementById('cursor');
+        const cursorDot = document.getElementById('cursor-dot');
         
-        if (cursorDot) {
-          cursorDot.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
-        }
-      });
-      
-      const animateCursor = () => {
-        let dx = mouseX - cursorX;
-        let dy = mouseY - cursorY;
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let cursorX = mouseX;
+        let cursorY = mouseY;
         
-        cursorX += dx * 0.15;
-        cursorY += dy * 0.15;
+        const handleMouseMove = (e: MouseEvent) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          
+          if(cursorDot) {
+            cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+          }
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
         
-        if (cursor) {
-          cursor.style.transform = `translate(${cursorX - 16}px, ${cursorY - 16}px)`;
-        }
-        
-        requestAnimationFrame(animateCursor);
-      };
-      
-      animateCursor();
-      
-      // Update hover logic when navigating
-      const updateHoverEffects = () => {
-        const interactables = document.querySelectorAll('a, button, input, .hover-target');
-        interactables.forEach(el => {
-          el.addEventListener('mouseenter', () => {
-            if (cursor) cursor.classList.add('scale-150', 'bg-primary-500', 'opacity-50');
+        let animationFrameId: number;
+        const animate = () => {
+          cursorX += (mouseX - cursorX) * 0.15;
+          cursorY += (mouseY - cursorY) * 0.15;
+          
+          if(cursor) {
+            cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
+          }
+          
+          animationFrameId = requestAnimationFrame(animate);
+        };
+        animate();
+
+        // Hover effects
+        const updateHoverEffects = () => {
+          const hoverTriggers = document.querySelectorAll('.hover-trigger, .hover-target, a, button, input, textarea');
+          hoverTriggers.forEach(trigger => {
+            trigger.addEventListener('mouseenter', () => cursor?.classList.add('cursor-hover'));
+            trigger.addEventListener('mouseleave', () => cursor?.classList.remove('cursor-hover'));
           });
-          el.addEventListener('mouseleave', () => {
-            if (cursor) cursor.classList.remove('scale-150', 'bg-primary-500', 'opacity-50');
-          });
-        });
+        };
+
+        updateHoverEffects();
+        
+        // Cleanup function for Astro view transitions
+        return () => {
+          document.removeEventListener('mousemove', handleMouseMove);
+          cancelAnimationFrame(animationFrameId);
+        };
       };
 
-      // Run initially and on view transitions if used
-      updateHoverEffects();
-      document.addEventListener('astro:page-load', updateHoverEffects);
+      let cleanup: (() => void) | undefined;
+      
+      // Initialize on load
+      cleanup = initCursor();
+      
+      // Re-initialize on view transitions
+      document.addEventListener('astro:page-load', () => {
+        if(cleanup) cleanup();
+        cleanup = initCursor();
+      });
     </script>
   </body>
 </html>

@@ -39,50 +39,50 @@ const pageNumbers = getPageNumbers();
 ---
 
 {totalPages > 1 && (
-  <nav class="flex items-center justify-center space-x-1" aria-label="分页导航">
+  <nav class="flex items-center justify-center space-x-4 font-mono" aria-label="分页导航">
     <!-- 上一页 -->
     {currentPage > 1 ? (
       <a
         href={buildUrl(currentPage - 1)}
-        class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors"
+        class="flex items-center px-4 py-2 text-sm text-zinc-400 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-colors hover-trigger"
       >
-        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
-        上一页
+        PREV
       </a>
     ) : (
-      <span class="flex items-center px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-lg cursor-not-allowed">
-        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <span class="flex items-center px-4 py-2 text-sm text-zinc-600 border border-white/5 rounded-xl cursor-not-allowed">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
-        上一页
+        PREV
       </span>
     )}
 
     <!-- 页码 -->
-    <div class="hidden sm:flex items-center space-x-1">
+    <div class="hidden sm:flex items-center space-x-2">
       {pageNumbers.map((page) => (
         typeof page === 'number' ? (
           <a
             href={buildUrl(page)}
-            class={`px-3.5 py-2 text-sm font-medium rounded-lg border transition-colors ${
+            class={`w-10 h-10 flex items-center justify-center text-sm rounded-xl border transition-colors hover-trigger ${
               page === currentPage
-                ? 'bg-primary-500 text-white border-primary-500'
-                : 'text-gray-600 bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                ? 'bg-primary/20 text-primary border-primary/50'
+                : 'text-zinc-400 border-white/10 hover:bg-white/10 hover:text-white'
             }`}
             aria-current={page === currentPage ? 'page' : undefined}
           >
             {page}
           </a>
         ) : (
-          <span class="px-2 py-2 text-gray-400">...</span>
+          <span class="px-2 py-2 text-zinc-600">...</span>
         )
       ))}
     </div>
 
     <!-- 当前页/总页数 (移动端) -->
-    <span class="sm:hidden px-3 py-2 text-sm text-gray-600">
+    <span class="sm:hidden px-3 py-2 text-sm text-zinc-500">
       {currentPage} / {totalPages}
     </span>
 
@@ -90,17 +90,17 @@ const pageNumbers = getPageNumbers();
     {currentPage < totalPages ? (
       <a
         href={buildUrl(currentPage + 1)}
-        class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors"
+        class="flex items-center px-4 py-2 text-sm text-zinc-400 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-colors hover-trigger"
       >
-        下一页
-        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        NEXT
+        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
       </a>
     ) : (
-      <span class="flex items-center px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-lg cursor-not-allowed">
-        下一页
-        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <span class="flex items-center px-4 py-2 text-sm text-zinc-600 border border-white/5 rounded-xl cursor-not-allowed">
+        NEXT
+        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
       </span>

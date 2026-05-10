@@ -1,5 +1,5 @@
 ---
-// CommentSection 组件 - 评论区
+// CommentSection 组件 - SYS.LOG 风格评论区
 import { commentApi, type Comment } from '../utils/api';
 
 interface Props {
@@ -18,28 +18,28 @@ try {
 }
 ---
 
-<section class="mt-12 bg-white rounded-xl border border-gray-100 p-6 sm:p-8" id="comment-section" data-article-id={articleId}>
+<section class="mt-16 pt-16 border-t border-white/10" id="comment-section" data-article-id={articleId}>
   <!-- 评论区标题 -->
-  <div class="mb-6">
-    <h2 class="text-xl font-bold text-gray-900 flex items-center">
-      <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+  <div class="mb-10">
+    <h2 class="font-display text-2xl md:text-3xl font-bold flex items-center text-white">
+      <svg class="w-6 h-6 mr-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
       </svg>
-      <span>评论区</span>
-      <span class="ml-2 text-gray-500 text-sm font-normal" id="comment-count-text">（共 {commentCount} 条）</span>
+      SYSTEM THREADS
+      <span class="ml-4 text-zinc-500 font-mono text-sm font-normal" id="comment-count-text">[{commentCount} THREADS ACTIVE]</span>
     </h2>
   </div>
 
   <!-- 发表评论框 -->
-  <div class="mb-8 p-4 bg-gray-50 rounded-lg" id="comment-form-container">
+  <div class="mb-12 p-6 glass rounded-2xl border border-white/5" id="comment-form-container">
     <!-- 游客信息输入框 -->
-    <div class="mb-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-sm">
       <div>
         <input
           type="text"
           id="guest-nickname"
-          class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
-          placeholder="昵称（必填）"
+          class="w-full px-4 py-3 bg-surface/50 border border-white/10 rounded-xl focus:outline-none focus:border-primary focus:bg-surface/80 text-white placeholder:text-zinc-600 transition-colors hover-trigger"
+          placeholder="USER_ALIAS (REQUIRED)"
           maxlength="50"
         />
       </div>
@@ -47,57 +47,57 @@ try {
         <input
           type="email"
           id="guest-email"
-          class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
-          placeholder="邮箱（必填）"
+          class="w-full px-4 py-3 bg-surface/50 border border-white/10 rounded-xl focus:outline-none focus:border-primary focus:bg-surface/80 text-white placeholder:text-zinc-600 transition-colors hover-trigger"
+          placeholder="SECURE_EMAIL (REQUIRED)"
           maxlength="100"
         />
       </div>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-4 font-mono text-sm">
       <textarea
         id="comment-content"
-        class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 resize-none transition-all"
-        placeholder="写下你的评论..."
-        rows="3"
+        class="w-full px-4 py-4 bg-surface/50 border border-white/10 rounded-xl focus:outline-none focus:border-primary focus:bg-surface/80 text-white placeholder:text-zinc-600 resize-none transition-colors hover-trigger"
+        placeholder="INITIALIZE TRANSMISSION..."
+        rows="4"
         maxlength="500"
       ></textarea>
-      <div class="flex justify-end mt-2 text-xs text-gray-400">
-        <span id="char-count">0</span>/500
+      <div class="flex justify-end mt-2 text-xs text-zinc-500">
+        <span id="char-count">0</span>/500 BYTES
       </div>
     </div>
 
     <div class="flex justify-end">
       <button
         id="submit-comment-btn"
-        class="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 active:bg-primary-700 transition-colors font-medium"
+        class="px-6 py-3 bg-white/10 text-white font-mono text-sm rounded-xl hover:bg-primary hover:text-black transition-colors hover-trigger font-bold tracking-wider"
       >
-        发表评论
+        TRANSMIT
       </button>
     </div>
   </div>
 
   <!-- 评论列表 -->
-  <div id="comments-list" class="space-y-6">
+  <div id="comments-list" class="space-y-8">
     <!-- 评论将由客户端 JS 加载 -->
   </div>
 
   <!-- 加载更多按钮 -->
-  <div id="load-more-container" class="hidden mt-6 text-center">
+  <div id="load-more-container" class="hidden mt-10 text-center">
     <button
       id="load-more-btn"
-      class="px-6 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium"
+      class="px-6 py-2 bg-white/5 border border-white/10 text-zinc-400 font-mono text-sm rounded-xl hover:bg-white/10 hover:text-white transition-colors hover-trigger"
     >
-      加载更多评论
+      LOAD ADDITIONAL THREADS
     </button>
   </div>
 
   <!-- 无评论提示 -->
-  <div id="no-comments" class="py-12 text-center text-gray-400">
-    <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.98L11 16l-1.5 2H9a9 9 0 01-9-9c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+  <div id="no-comments" class="py-16 text-center text-zinc-500 glass rounded-2xl border-dashed border-white/10 mt-8">
+    <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.98L11 16l-1.5 2H9a9 9 0 01-9-9c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
     </svg>
-    <p>暂无评论，快来发表第一条吧！</p>
+    <p class="font-mono text-sm tracking-widest uppercase">No transmission records found.</p>
   </div>
 </section>
 
@@ -110,7 +110,7 @@ try {
   let hasMore = false;
 
   // 工具函数：相对时间格式化
-  function formatRelativeTime(dateStr: string): string {
+  function formatRelativeTime(dateStr) {
     const date = new Date(dateStr);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
@@ -121,24 +121,24 @@ try {
     const days = Math.floor(hours / 24);
 
     if (seconds < 60) {
-      return '刚刚';
+      return 'JUST NOW';
     } else if (minutes < 60) {
-      return `${minutes}分钟前`;
+      return `${minutes} MIN AGO`;
     } else if (hours < 24) {
-      return `${hours}小时前`;
+      return `${hours} HRS AGO`;
     } else if (days < 30) {
-      return `${days}天前`;
+      return `${days} DAYS AGO`;
     } else {
-      return date.toLocaleDateString('zh-CN', {
+      return date.toLocaleDateString('en-US', {
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric'
-      });
+      }).toUpperCase();
     }
   }
 
   // 工具函数：邮箱脱敏
-  function maskEmail(email: string | null): string {
+  function maskEmail(email) {
     if (!email) return '';
     const parts = email.split('@');
     if (parts.length !== 2) return email;
@@ -148,7 +148,7 @@ try {
   }
 
   // 工具函数：XSS防护转义（使用简单的HTML转义替代DOMPurify）
-  function escapeHtml(text: string): string {
+  function escapeHtml(text) {
     return text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -158,51 +158,55 @@ try {
   }
 
   // 渲染单个评论卡片
-  function renderCommentCard(comment, isReply: boolean = false): string {
+  function renderCommentCard(comment, isReply = false) {
     const showReplyButton = !isReply; // 二级回复不能再回复
 
     return `
-      <div class="comment-card ${isReply ? 'ml-4 sm:ml-6 pl-4 sm:pl-6 border-l-2 border-gray-200' : 'bg-white border border-gray-100 rounded-lg p-4'}" data-comment-id="${comment.id}">
+      <div class="comment-card ${isReply ? 'ml-6 sm:ml-10 pl-6 sm:pl-8 border-l-2 border-white/10' : 'glass border border-white/5 rounded-2xl p-6'}" data-comment-id="${comment.id}">
         <!-- 评论头部 -->
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center space-x-2">
-            <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
-              <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <span class="font-medium text-gray-900">${escapeHtml(comment.nickname)}</span>
-            ${comment.email ? `<span class="text-xs text-gray-400">${maskEmail(comment.email)}</span>` : ''}
-            ${comment.replyToNickname ? `<span class="text-sm text-gray-500">回复 <span class="text-primary-600">@${escapeHtml(comment.replyToNickname)}</span></span>` : ''}
+            <div class="flex flex-col">
+              <div class="flex items-center gap-2">
+                <span class="font-display font-bold text-white">${escapeHtml(comment.nickname)}</span>
+                ${comment.replyToNickname ? `<span class="text-xs text-zinc-500 font-mono">REPLYING TO <span class="text-primary">@${escapeHtml(comment.replyToNickname)}</span></span>` : ''}
+              </div>
+              ${comment.email ? `<span class="text-[10px] text-zinc-600 font-mono uppercase">${maskEmail(comment.email)}</span>` : ''}
+            </div>
           </div>
-          <time class="text-xs text-gray-400">${formatRelativeTime(comment.createTime)}</time>
+          <time class="text-xs text-zinc-500 font-mono bg-white/5 px-2 py-1 rounded">${formatRelativeTime(comment.createTime)}</time>
         </div>
 
         <!-- 评论内容 -->
-        <div class="text-gray-700 mb-3 leading-relaxed">
+        <div class="text-zinc-300 mb-4 leading-relaxed font-light">
           ${escapeHtml(comment.content)}
         </div>
 
         <!-- 操作按钮 -->
         ${showReplyButton ? `
           <button
-            class="reply-btn text-sm text-gray-500 hover:text-primary-600 transition-colors flex items-center"
+            class="reply-btn text-xs text-zinc-500 hover:text-primary transition-colors flex items-center font-mono hover-trigger"
             data-comment-id="${comment.id}"
             data-nickname="${escapeHtml(comment.nickname)}"
           >
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
             </svg>
-            回复
+            REPLY TO THREAD
           </button>
         ` : ''}
 
         <!-- 回复框容器 -->
-        <div class="reply-form-container hidden mt-4" data-comment-id="${comment.id}"></div>
+        <div class="reply-form-container hidden mt-6" data-comment-id="${comment.id}"></div>
 
         <!-- 子回复列表 -->
         ${comment.replies && comment.replies.length > 0 ? `
-          <div class="replies-list mt-4 space-y-4">
+          <div class="replies-list mt-6 space-y-6">
             ${comment.replies.map(reply => renderCommentCard(reply, true)).join('')}
           </div>
         ` : ''}
@@ -211,7 +215,7 @@ try {
   }
 
   // 加载评论列表
-  async function loadComments(page: number = 1) {
+  async function loadComments(page = 1) {
     const commentSection = document.getElementById('comment-section');
     const articleId = parseInt(commentSection?.getAttribute('data-article-id') || '0');
     if (!articleId) return;
@@ -243,7 +247,7 @@ try {
       }
 
       if (commentCountText) {
-        commentCountText.textContent = `（共 ${totalComments} 条）`;
+        commentCountText.textContent = `[${totalComments} THREADS ACTIVE]`;
       }
 
       if (loadMoreContainer) {
@@ -260,7 +264,7 @@ try {
       bindCommentEvents();
     } catch (error) {
       console.error('Failed to load comments:', error);
-      showError('加载评论失败，请稍后重试');
+      showError('System error: Failed to fetch threads.');
     }
   }
 
@@ -273,8 +277,8 @@ try {
   }
 
   // 处理回复点击
-  function handleReplyClick(event: Event) {
-    const btn = event.currentTarget as HTMLElement;
+  function handleReplyClick(event) {
+    const btn = event.currentTarget;
     const commentId = parseInt(btn.dataset.commentId || '0');
     const nickname = btn.dataset.nickname || '';
     const container = document.querySelector(`.reply-form-container[data-comment-id="${commentId}"]`);
@@ -296,36 +300,36 @@ try {
 
     // 显示回复框
     container.innerHTML = `
-      <div class="bg-gray-50 rounded-lg p-3">
-        <div class="text-sm text-gray-600 mb-2">回复 @${nickname}</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+      <div class="bg-black/30 border border-white/5 rounded-xl p-4">
+        <div class="text-xs text-zinc-500 font-mono mb-3">REPLYING TO @${nickname}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 font-mono text-xs">
           <input
             type="text"
-            class="reply-nickname px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500"
-            placeholder="昵称（必填）"
+            class="reply-nickname px-4 py-2 bg-surface/50 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-white placeholder:text-zinc-600 transition-colors hover-trigger"
+            placeholder="USER_ALIAS (REQUIRED)"
             maxlength="50"
           />
           <input
             type="email"
-            class="reply-email px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500"
-            placeholder="邮箱（必填）"
+            class="reply-email px-4 py-2 bg-surface/50 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-white placeholder:text-zinc-600 transition-colors hover-trigger"
+            placeholder="SECURE_EMAIL (REQUIRED)"
             maxlength="100"
           />
         </div>
         <textarea
-          class="reply-content w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 resize-none"
-          placeholder="写下你的回复..."
-          rows="2"
+          class="reply-content w-full px-4 py-3 bg-surface/50 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-white placeholder:text-zinc-600 resize-none font-mono text-sm transition-colors hover-trigger"
+          placeholder="INITIALIZE REPLY TRANSMISSION..."
+          rows="3"
           maxlength="500"
         ></textarea>
-        <div class="flex justify-between items-center mt-2">
-          <span class="text-xs text-gray-400 reply-char-count">0/500</span>
+        <div class="flex justify-between items-center mt-3">
+          <span class="text-[10px] text-zinc-600 font-mono reply-char-count">0/500 BYTES</span>
           <div class="flex space-x-2">
-            <button class="cancel-reply-btn px-4 py-1 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-colors text-sm">
-              取消
+            <button class="cancel-reply-btn px-4 py-1.5 bg-white/5 text-zinc-400 font-mono text-xs rounded-lg hover:bg-white/10 hover:text-white transition-colors hover-trigger">
+              ABORT
             </button>
-            <button class="submit-reply-btn px-4 py-1 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors text-sm" data-comment-id="${commentId}">
-              发表
+            <button class="submit-reply-btn px-4 py-1.5 bg-white/10 text-white font-mono font-bold text-xs rounded-lg hover:bg-primary hover:text-black transition-colors hover-trigger" data-comment-id="${commentId}">
+              TRANSMIT
             </button>
           </div>
         </div>
@@ -334,7 +338,7 @@ try {
     container.classList.remove('hidden');
 
     // 绑定回复框内事件
-    const replyContent = container.querySelector('.reply-content') as HTMLTextAreaElement;
+    const replyContent = container.querySelector('.reply-content');
     const replyCharCount = container.querySelector('.reply-char-count');
     const cancelBtn = container.querySelector('.cancel-reply-btn');
     const submitBtn = container.querySelector('.submit-reply-btn');
@@ -343,7 +347,7 @@ try {
     replyContent?.addEventListener('input', () => {
       const length = replyContent.value.length;
       if (replyCharCount) {
-        replyCharCount.textContent = `${length}/500`;
+        replyCharCount.textContent = `${length}/500 BYTES`;
       }
     });
 
@@ -355,25 +359,25 @@ try {
 
     // 发表回复
     submitBtn?.addEventListener('click', () => {
-      const replyNickname = (container.querySelector('.reply-nickname') as HTMLInputElement)?.value?.trim();
-      const replyEmail = (container.querySelector('.reply-email') as HTMLInputElement)?.value?.trim();
+      const replyNickname = container.querySelector('.reply-nickname')?.value?.trim();
+      const replyEmail = container.querySelector('.reply-email')?.value?.trim();
       submitReply(commentId, replyContent?.value || '', replyNickname, replyEmail);
     });
   }
 
   // 发表回复
-  async function submitReply(parentCommentId: number, content: string, nickname: string, email: string) {
+  async function submitReply(parentCommentId, content, nickname, email) {
     const commentSection = document.getElementById('comment-section');
     const articleId = parseInt(commentSection?.getAttribute('data-article-id') || '0');
     if (!articleId) return;
 
     if (!nickname || !email) {
-      showError('请填写昵称和邮箱');
+      showError('ALIAS and SECURE_EMAIL are required.');
       return;
     }
 
     if (!content.trim()) {
-      showError('回复内容不能为空');
+      showError('Transmission content cannot be empty.');
       return;
     }
 
@@ -388,7 +392,7 @@ try {
       };
 
       await commentApi.createComment(data);
-      showSuccess('回复发表成功');
+      showSuccess('Transmission successful.');
 
       // 关闭回复框并重新加载
       document.querySelectorAll('.reply-form-container').forEach(c => {
@@ -399,7 +403,7 @@ try {
       loadComments(1);
     } catch (error) {
       console.error('Failed to submit reply:', error);
-      showError('回复发表失败，请稍后重试');
+      showError('Transmission failed. Retry requested.');
     }
   }
 
@@ -409,26 +413,26 @@ try {
     const articleId = parseInt(commentSection?.getAttribute('data-article-id') || '0');
     if (!articleId) return;
 
-    const contentInput = document.getElementById('comment-content') as HTMLTextAreaElement;
-    const nicknameInput = document.getElementById('guest-nickname') as HTMLInputElement;
-    const emailInput = document.getElementById('guest-email') as HTMLInputElement;
+    const contentInput = document.getElementById('comment-content');
+    const nicknameInput = document.getElementById('guest-nickname');
+    const emailInput = document.getElementById('guest-email');
 
     const content = contentInput?.value?.trim();
     const nickname = nicknameInput?.value?.trim();
     const email = emailInput?.value?.trim();
 
     if (!nickname) {
-      showError('请填写昵称');
+      showError('ALIAS is required.');
       return;
     }
 
     if (!email) {
-      showError('请填写邮箱');
+      showError('SECURE_EMAIL is required.');
       return;
     }
 
     if (!content) {
-      showError('评论内容不能为空');
+      showError('Transmission content cannot be empty.');
       return;
     }
 
@@ -441,7 +445,7 @@ try {
       };
 
       await commentApi.createComment(data);
-      showSuccess('评论发表成功');
+      showSuccess('Transmission successful.');
 
       // 清空输入框并重新加载
       if (contentInput) {
@@ -455,18 +459,18 @@ try {
       loadComments(1);
     } catch (error) {
       console.error('Failed to submit comment:', error);
-      showError('评论发表失败，请稍后重试');
+      showError('Transmission failed. Retry requested.');
     }
   }
 
   // 显示成功提示
-  function showSuccess(message: string) {
-    alert(message);
+  function showSuccess(message) {
+    alert(`[SYS.LOG] ${message}`);
   }
 
   // 显示错误提示
-  function showError(message: string) {
-    alert(message);
+  function showError(message) {
+    alert(`[SYS.ERR] ${message}`);
   }
 
   // 初始化
@@ -474,7 +478,7 @@ try {
     loadComments(1);
 
     // 评论内容字数统计
-    const commentContent = document.getElementById('comment-content') as HTMLTextAreaElement;
+    const commentContent = document.getElementById('comment-content');
     const charCount = document.getElementById('char-count');
 
     commentContent?.addEventListener('input', () => {
