@@ -40,7 +40,11 @@ jobs:
           cache: npm
           cache-dependency-path: front-end/blog-frontend/package-lock.json
       - name: Build
-        run: cd front-end/blog-frontend && npm ci && npm run build
+        run: |
+          cd front-end/blog-frontend
+          npm ci
+          npm install @rollup/rollup-linux-x64-gnu --save-optional
+          npm run build
       - name: Clean old dist on server
         uses: appleboy/ssh-action@v1
         with:
