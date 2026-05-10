@@ -49,7 +49,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: rm -rf /var/www/blog/frontend/dist
       - name: Upload dist + package files
-        uses: appleboy/scp-action@v0
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.TENCENT_HOST }}
           username: root
@@ -94,7 +94,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: rm -rf /var/www/blog/admin/assets /var/www/blog/admin/index.html /var/www/blog/admin/favicon.svg
       - name: Upload to Tencent
-        uses: appleboy/scp-action@v0
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.TENCENT_HOST }}
           username: root
@@ -131,7 +131,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: rm -rf /var/www/blog/manager/assets /var/www/blog/manager/index.html
       - name: Upload to Tencent
-        uses: appleboy/scp-action@v0
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.TENCENT_HOST }}
           username: root
@@ -161,7 +161,7 @@ jobs:
       - name: Build
         run: cd back-end && mvn clean package -DskipTests -B
       - name: Upload jar to Qiniuyun
-        uses: appleboy/scp-action@v0
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.QINIUYUN_HOST }}
           username: root
