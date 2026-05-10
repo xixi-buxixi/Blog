@@ -10,7 +10,9 @@ export interface LoginParams {
 // 登录响应
 export interface LoginResponse {
   token: string;
-  user: {
+  tokenType: string;
+  expiresIn: number;
+  userInfo: {
     id: number;
     username: string;
     nickname: string;

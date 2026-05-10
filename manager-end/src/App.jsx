@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { getToken } from '@/utils/auth'
+import { getToken, removeToken } from '@/utils/auth'
+import { getUserInfo } from '@/api/auth'
 import Layout from '@/components/Layout'
 import Login from '@/pages/Login'
 import Dashboard from '@/pages/Dashboard'
@@ -8,18 +10,57 @@ import ArticleEdit from '@/pages/Article/Edit'
 import Category from '@/pages/Category'
 
 // 路由守卫
-function PrivateRoute({ children }) {
-  return getToken() ? children : <Navigate to="/login" replace />
+function PrivateRoute({ children, isAuthenticated, loading }) {
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh'
+      }}>
+        加载中...
+      </div>
+    )
+  }
+  return isAuthenticated ? children : <Navigate to="/login" replace />
 }
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      const token = getToken()
+      if (!token) {
+        setLoading(false)
+        return
+      }
+
+      try {
+        await getUserInfo()
+        setIsAuthenticated(true)
+      } catch (error) {
+        removeToken()
+        setIsAuthenticated(false)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    verifyToken()
+  }, [])
+
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={
+        isAuthenticated ? <Navigate to="/" replace /> : <Login onLoginSuccess={() => setIsAuthenticated(true)} />
+      } />
       <Route
         path="/"
         element={
-          <PrivateRoute>
+          <PrivateRoute isAuthenticated={isAuthenticated} loading={loading}>
             <Layout />
           </PrivateRoute>
         }

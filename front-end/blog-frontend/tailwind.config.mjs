@@ -5,16 +5,16 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          50: '#fff3eb',
+          100: '#ffe3cc',
+          200: '#ffc699',
+          300: '#ffa266',
+          400: '#ff7b33',
+          500: '#FF5500',
+          600: '#cc4400',
+          700: '#993300',
+          800: '#662200',
+          900: '#331100',
         },
         gray: {
           50: '#f9fafb',
@@ -31,6 +31,7 @@ export default {
       },
       fontFamily: {
         sans: [
+          'Inter',
           '-apple-system',
           'BlinkMacSystemFont',
           'Segoe UI',
@@ -39,6 +40,14 @@ export default {
           'Arial',
           'Noto Sans',
           'sans-serif',
+        ],
+        serif: [
+          '"Playfair Display"',
+          'Georgia',
+          'Cambria',
+          '"Times New Roman"',
+          'Times',
+          'serif',
         ],
         mono: [
           'SF Mono',

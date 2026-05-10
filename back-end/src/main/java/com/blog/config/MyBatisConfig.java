@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
  * @author blog
  */
 @Configuration
+@EnableScheduling
 public class MyBatisConfig {
 
     /**
@@ -38,6 +40,7 @@ public class MyBatisConfig {
             public void insertFill(MetaObject metaObject) {
                 this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, LocalDateTime.now());
                 this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+                this.strictInsertFill(metaObject, "viewTime", LocalDateTime.class, LocalDateTime.now());
             }
 
             @Override

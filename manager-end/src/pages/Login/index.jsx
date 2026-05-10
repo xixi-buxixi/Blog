@@ -2,27 +2,25 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Form, Input, Button, message } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
-import { login, encodePassword } from '@/api/auth'
+import { login } from '@/api/auth'
 import { setToken } from '@/utils/auth'
 
-function Login() {
+function Login({ onLoginSuccess }) {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   const handleSubmit = async (values) => {
     setLoading(true)
     try {
-      // 1. 先调用加密接口获取BCrypt哈希
-      const hashedPassword = await encodePassword(values.password)
-
-      // 2. 用哈希密码进行登录
+      // 直接用明文密码登录，后端会验证
       const res = await login({
         username: values.username,
-        password: hashedPassword
+        password: values.password
       })
 
       setToken(res.token)
       message.success('登录成功')
+      onLoginSuccess?.()
       navigate('/dashboard')
     } catch (e) {
       // error handled in request

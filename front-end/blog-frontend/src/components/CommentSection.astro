@@ -1,0 +1,499 @@
+---
+// CommentSection 组件 - 评论区
+import { commentApi, type Comment } from '../utils/api';
+
+interface Props {
+  articleId: number;
+}
+
+const { articleId } = Astro.props;
+
+// 获取初始评论数量（SSR）
+let commentCount = 0;
+try {
+  const res = await commentApi.getCommentCount(articleId);
+  commentCount = res.data.total;
+} catch (e) {
+  console.error('Failed to fetch comment count:', e);
+}
+---
+
+<section class="mt-12 bg-white rounded-xl border border-gray-100 p-6 sm:p-8" id="comment-section" data-article-id={articleId}>
+  <!-- 评论区标题 -->
+  <div class="mb-6">
+    <h2 class="text-xl font-bold text-gray-900 flex items-center">
+      <svg class="w-5 h-5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+      </svg>
+      <span>评论区</span>
+      <span class="ml-2 text-gray-500 text-sm font-normal" id="comment-count-text">（共 {commentCount} 条）</span>
+    </h2>
+  </div>
+
+  <!-- 发表评论框 -->
+  <div class="mb-8 p-4 bg-gray-50 rounded-lg" id="comment-form-container">
+    <!-- 游客信息输入框 -->
+    <div class="mb-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div>
+        <input
+          type="text"
+          id="guest-nickname"
+          class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+          placeholder="昵称（必填）"
+          maxlength="50"
+        />
+      </div>
+      <div>
+        <input
+          type="email"
+          id="guest-email"
+          class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+          placeholder="邮箱（必填）"
+          maxlength="100"
+        />
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <textarea
+        id="comment-content"
+        class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 resize-none transition-all"
+        placeholder="写下你的评论..."
+        rows="3"
+        maxlength="500"
+      ></textarea>
+      <div class="flex justify-end mt-2 text-xs text-gray-400">
+        <span id="char-count">0</span>/500
+      </div>
+    </div>
+
+    <div class="flex justify-end">
+      <button
+        id="submit-comment-btn"
+        class="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 active:bg-primary-700 transition-colors font-medium"
+      >
+        发表评论
+      </button>
+    </div>
+  </div>
+
+  <!-- 评论列表 -->
+  <div id="comments-list" class="space-y-6">
+    <!-- 评论将由客户端 JS 加载 -->
+  </div>
+
+  <!-- 加载更多按钮 -->
+  <div id="load-more-container" class="hidden mt-6 text-center">
+    <button
+      id="load-more-btn"
+      class="px-6 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors font-medium"
+    >
+      加载更多评论
+    </button>
+  </div>
+
+  <!-- 无评论提示 -->
+  <div id="no-comments" class="py-12 text-center text-gray-400">
+    <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.98L11 16l-1.5 2H9a9 9 0 01-9-9c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+    </svg>
+    <p>暂无评论，快来发表第一条吧！</p>
+  </div>
+</section>
+
+<script define:vars={{ commentCount }}>
+  import { commentApi } from '../utils/api';
+
+  // 状态管理
+  let currentPage = 1;
+  let totalComments = 0;
+  let hasMore = false;
+
+  // 工具函数：相对时间格式化
+  function formatRelativeTime(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (seconds < 60) {
+      return '刚刚';
+    } else if (minutes < 60) {
+      return `${minutes}分钟前`;
+    } else if (hours < 24) {
+      return `${hours}小时前`;
+    } else if (days < 30) {
+      return `${days}天前`;
+    } else {
+      return date.toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+  }
+
+  // 工具函数：邮箱脱敏
+  function maskEmail(email: string | null): string {
+    if (!email) return '';
+    const parts = email.split('@');
+    if (parts.length !== 2) return email;
+    const [username, domain] = parts;
+    const maskedUsername = username.charAt(0) + '***';
+    return `${maskedUsername}@${domain}`;
+  }
+
+  // 工具函数：XSS防护转义（使用简单的HTML转义替代DOMPurify）
+  function escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  // 渲染单个评论卡片
+  function renderCommentCard(comment, isReply: boolean = false): string {
+    const showReplyButton = !isReply; // 二级回复不能再回复
+
+    return `
+      <div class="comment-card ${isReply ? 'ml-4 sm:ml-6 pl-4 sm:pl-6 border-l-2 border-gray-200' : 'bg-white border border-gray-100 rounded-lg p-4'}" data-comment-id="${comment.id}">
+        <!-- 评论头部 -->
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
+              <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <span class="font-medium text-gray-900">${escapeHtml(comment.nickname)}</span>
+            ${comment.email ? `<span class="text-xs text-gray-400">${maskEmail(comment.email)}</span>` : ''}
+            ${comment.replyToNickname ? `<span class="text-sm text-gray-500">回复 <span class="text-primary-600">@${escapeHtml(comment.replyToNickname)}</span></span>` : ''}
+          </div>
+          <time class="text-xs text-gray-400">${formatRelativeTime(comment.createTime)}</time>
+        </div>
+
+        <!-- 评论内容 -->
+        <div class="text-gray-700 mb-3 leading-relaxed">
+          ${escapeHtml(comment.content)}
+        </div>
+
+        <!-- 操作按钮 -->
+        ${showReplyButton ? `
+          <button
+            class="reply-btn text-sm text-gray-500 hover:text-primary-600 transition-colors flex items-center"
+            data-comment-id="${comment.id}"
+            data-nickname="${escapeHtml(comment.nickname)}"
+          >
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+            </svg>
+            回复
+          </button>
+        ` : ''}
+
+        <!-- 回复框容器 -->
+        <div class="reply-form-container hidden mt-4" data-comment-id="${comment.id}"></div>
+
+        <!-- 子回复列表 -->
+        ${comment.replies && comment.replies.length > 0 ? `
+          <div class="replies-list mt-4 space-y-4">
+            ${comment.replies.map(reply => renderCommentCard(reply, true)).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  // 加载评论列表
+  async function loadComments(page: number = 1) {
+    const commentSection = document.getElementById('comment-section');
+    const articleId = parseInt(commentSection?.getAttribute('data-article-id') || '0');
+    if (!articleId) return;
+
+    try {
+      const res = await commentApi.getComments(articleId, page, 20);
+      const comments = res.data.records;
+      totalComments = res.data.total;
+      hasMore = page < res.data.pages;
+
+      const commentsList = document.getElementById('comments-list');
+      const noComments = document.getElementById('no-comments');
+      const loadMoreContainer = document.getElementById('load-more-container');
+      const commentCountText = document.getElementById('comment-count-text');
+
+      if (commentsList) {
+        if (page === 1) {
+          commentsList.innerHTML = '';
+        }
+
+        if (comments.length > 0) {
+          comments.forEach(comment => {
+            commentsList.innerHTML += renderCommentCard(comment);
+          });
+          noComments?.classList.add('hidden');
+        } else if (page === 1) {
+          noComments?.classList.remove('hidden');
+        }
+      }
+
+      if (commentCountText) {
+        commentCountText.textContent = `（共 ${totalComments} 条）`;
+      }
+
+      if (loadMoreContainer) {
+        if (hasMore) {
+          loadMoreContainer.classList.remove('hidden');
+        } else {
+          loadMoreContainer.classList.add('hidden');
+        }
+      }
+
+      currentPage = page;
+
+      // 绑定事件
+      bindCommentEvents();
+    } catch (error) {
+      console.error('Failed to load comments:', error);
+      showError('加载评论失败，请稍后重试');
+    }
+  }
+
+  // 绑定评论交互事件
+  function bindCommentEvents() {
+    // 回复按钮事件
+    document.querySelectorAll('.reply-btn').forEach(btn => {
+      btn.addEventListener('click', handleReplyClick);
+    });
+  }
+
+  // 处理回复点击
+  function handleReplyClick(event: Event) {
+    const btn = event.currentTarget as HTMLElement;
+    const commentId = parseInt(btn.dataset.commentId || '0');
+    const nickname = btn.dataset.nickname || '';
+    const container = document.querySelector(`.reply-form-container[data-comment-id="${commentId}"]`);
+
+    if (!container) return;
+
+    // 如果已有回复框，则关闭
+    if (!container.classList.contains('hidden')) {
+      container.classList.add('hidden');
+      container.innerHTML = '';
+      return;
+    }
+
+    // 关闭其他回复框
+    document.querySelectorAll('.reply-form-container').forEach(c => {
+      c.classList.add('hidden');
+      c.innerHTML = '';
+    });
+
+    // 显示回复框
+    container.innerHTML = `
+      <div class="bg-gray-50 rounded-lg p-3">
+        <div class="text-sm text-gray-600 mb-2">回复 @${nickname}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <input
+            type="text"
+            class="reply-nickname px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500"
+            placeholder="昵称（必填）"
+            maxlength="50"
+          />
+          <input
+            type="email"
+            class="reply-email px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500"
+            placeholder="邮箱（必填）"
+            maxlength="100"
+          />
+        </div>
+        <textarea
+          class="reply-content w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 resize-none"
+          placeholder="写下你的回复..."
+          rows="2"
+          maxlength="500"
+        ></textarea>
+        <div class="flex justify-between items-center mt-2">
+          <span class="text-xs text-gray-400 reply-char-count">0/500</span>
+          <div class="flex space-x-2">
+            <button class="cancel-reply-btn px-4 py-1 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-colors text-sm">
+              取消
+            </button>
+            <button class="submit-reply-btn px-4 py-1 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors text-sm" data-comment-id="${commentId}">
+              发表
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    container.classList.remove('hidden');
+
+    // 绑定回复框内事件
+    const replyContent = container.querySelector('.reply-content') as HTMLTextAreaElement;
+    const replyCharCount = container.querySelector('.reply-char-count');
+    const cancelBtn = container.querySelector('.cancel-reply-btn');
+    const submitBtn = container.querySelector('.submit-reply-btn');
+
+    // 字数统计
+    replyContent?.addEventListener('input', () => {
+      const length = replyContent.value.length;
+      if (replyCharCount) {
+        replyCharCount.textContent = `${length}/500`;
+      }
+    });
+
+    // 取消回复
+    cancelBtn?.addEventListener('click', () => {
+      container.classList.add('hidden');
+      container.innerHTML = '';
+    });
+
+    // 发表回复
+    submitBtn?.addEventListener('click', () => {
+      const replyNickname = (container.querySelector('.reply-nickname') as HTMLInputElement)?.value?.trim();
+      const replyEmail = (container.querySelector('.reply-email') as HTMLInputElement)?.value?.trim();
+      submitReply(commentId, replyContent?.value || '', replyNickname, replyEmail);
+    });
+  }
+
+  // 发表回复
+  async function submitReply(parentCommentId: number, content: string, nickname: string, email: string) {
+    const commentSection = document.getElementById('comment-section');
+    const articleId = parseInt(commentSection?.getAttribute('data-article-id') || '0');
+    if (!articleId) return;
+
+    if (!nickname || !email) {
+      showError('请填写昵称和邮箱');
+      return;
+    }
+
+    if (!content.trim()) {
+      showError('回复内容不能为空');
+      return;
+    }
+
+    try {
+      const data = {
+        articleId,
+        content: content.trim(),
+        parentId: parentCommentId,
+        replyToId: parentCommentId,
+        nickname,
+        email,
+      };
+
+      await commentApi.createComment(data);
+      showSuccess('回复发表成功');
+
+      // 关闭回复框并重新加载
+      document.querySelectorAll('.reply-form-container').forEach(c => {
+        c.classList.add('hidden');
+        c.innerHTML = '';
+      });
+
+      loadComments(1);
+    } catch (error) {
+      console.error('Failed to submit reply:', error);
+      showError('回复发表失败，请稍后重试');
+    }
+  }
+
+  // 发表评论
+  async function submitComment() {
+    const commentSection = document.getElementById('comment-section');
+    const articleId = parseInt(commentSection?.getAttribute('data-article-id') || '0');
+    if (!articleId) return;
+
+    const contentInput = document.getElementById('comment-content') as HTMLTextAreaElement;
+    const nicknameInput = document.getElementById('guest-nickname') as HTMLInputElement;
+    const emailInput = document.getElementById('guest-email') as HTMLInputElement;
+
+    const content = contentInput?.value?.trim();
+    const nickname = nicknameInput?.value?.trim();
+    const email = emailInput?.value?.trim();
+
+    if (!nickname) {
+      showError('请填写昵称');
+      return;
+    }
+
+    if (!email) {
+      showError('请填写邮箱');
+      return;
+    }
+
+    if (!content) {
+      showError('评论内容不能为空');
+      return;
+    }
+
+    try {
+      const data = {
+        articleId,
+        content,
+        nickname,
+        email,
+      };
+
+      await commentApi.createComment(data);
+      showSuccess('评论发表成功');
+
+      // 清空输入框并重新加载
+      if (contentInput) {
+        contentInput.value = '';
+      }
+      const charCount = document.getElementById('char-count');
+      if (charCount) {
+        charCount.textContent = '0';
+      }
+
+      loadComments(1);
+    } catch (error) {
+      console.error('Failed to submit comment:', error);
+      showError('评论发表失败，请稍后重试');
+    }
+  }
+
+  // 显示成功提示
+  function showSuccess(message: string) {
+    alert(message);
+  }
+
+  // 显示错误提示
+  function showError(message: string) {
+    alert(message);
+  }
+
+  // 初始化
+  document.addEventListener('DOMContentLoaded', () => {
+    loadComments(1);
+
+    // 评论内容字数统计
+    const commentContent = document.getElementById('comment-content') as HTMLTextAreaElement;
+    const charCount = document.getElementById('char-count');
+
+    commentContent?.addEventListener('input', () => {
+      const length = commentContent.value.length;
+      if (charCount) {
+        charCount.textContent = `${length}`;
+      }
+    });
+
+    // 发表评论按钮
+    const submitBtn = document.getElementById('submit-comment-btn');
+    submitBtn?.addEventListener('click', submitComment);
+
+    // 加载更多按钮
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    loadMoreBtn?.addEventListener('click', () => {
+      if (hasMore) {
+        loadComments(currentPage + 1);
+      }
+    });
+  });
+</script>

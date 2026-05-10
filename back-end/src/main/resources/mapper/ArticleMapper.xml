@@ -125,4 +125,11 @@
         WHERE id = #{id} AND deleted = 0
     </update>
 
+    <!-- 查询总浏览量 -->
+    <select id="selectTotalViewCount" resultType="java.lang.Long">
+        SELECT COALESCE(SUM(view_count), 0)
+        FROM t_article
+        WHERE deleted = 0
+    </select>
+
 </mapper>

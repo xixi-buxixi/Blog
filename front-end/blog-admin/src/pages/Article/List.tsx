@@ -51,7 +51,7 @@ const ArticleList: React.FC = () => {
         title: keyword || undefined,
         categoryId,
       });
-      setArticles(res.data.list);
+      setArticles(res.data.records);
       setTotal(res.data.total);
     } catch (error) {
       // 错误已处理

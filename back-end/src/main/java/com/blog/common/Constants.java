@@ -35,4 +35,39 @@ public class Constants {
      */
     public static final String ROLE_ADMIN = "ADMIN";
 
+    /**
+     * 浏览记录保留天数
+     */
+    public static final Integer VIEW_RECORD_RETENTION_DAYS = 30;
+
+    /**
+     * 评论状态 - 待审核
+     */
+    public static final Integer COMMENT_STATUS_PENDING = 0;
+
+    /**
+     * 评论状态 - 已发布
+     */
+    public static final Integer COMMENT_STATUS_PUBLISHED = 1;
+
+    /**
+     * 评论状态 - 已删除
+     */
+    public static final Integer COMMENT_STATUS_DELETED = 2;
+
+    /**
+     * 评论内容最大长度
+     */
+    public static final Integer COMMENT_CONTENT_MAX_LENGTH = 500;
+
+    /**
+     * 评论昵称最小长度
+     */
+    public static final Integer COMMENT_NICKNAME_MIN_LENGTH = 2;
+
+    /**
+     * 评论昵称最大长度
+     */
+    public static final Integer COMMENT_NICKNAME_MAX_LENGTH = 50;
+
 }

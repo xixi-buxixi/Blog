@@ -9,8 +9,13 @@
   }
 
   body {
-    @apply bg-gray-50 text-gray-800 antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    @apply bg-white text-black antialiased font-sans cursor-none;
+    overflow-x: hidden;
+  }
+  
+  /* Make sure links and buttons also hide default cursor since we use a custom one */
+  a, button, input, textarea, select {
+    @apply cursor-none;
   }
 
   a {
@@ -161,9 +166,9 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded;
+  @apply bg-primary-500 rounded;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400;
+  @apply bg-primary-600;
 }

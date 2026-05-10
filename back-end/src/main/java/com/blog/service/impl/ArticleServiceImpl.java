@@ -6,12 +6,15 @@ import com.blog.common.PageResult;
 import com.blog.dto.ArticleDTO;
 import com.blog.dto.ArticleQueryDTO;
 import com.blog.entity.Article;
+import com.blog.entity.Category;
 import com.blog.exception.BusinessException;
 import com.blog.mapper.ArticleMapper;
 import com.blog.mapper.CategoryMapper;
 import com.blog.service.ArticleService;
+import com.blog.service.ArticleViewRecordService;
 import com.blog.util.UserContext;
 import com.blog.vo.ArticleListVO;
+import com.blog.vo.ArticleStatsVO;
 import com.blog.vo.ArticleVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private ArticleViewRecordService viewRecordService;
 
     @Override
     public PageResult<ArticleListVO> getArticleList(ArticleQueryDTO queryDTO) {
@@ -69,8 +75,10 @@ public class ArticleServiceImpl implements ArticleService {
             throw new BusinessException("文章不存在");
         }
 
-        // 增加浏览量
-        articleMapper.incrementViewCount(id);
+        // 检查并记录浏览（首次浏览才增加浏览量）
+        if (viewRecordService.checkAndRecordView(id)) {
+            articleMapper.incrementViewCount(id);
+        }
 
         return articleVO;
     }
@@ -157,6 +165,45 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.deleteById(id);
 
         log.info("删除文章成功: id={}", id);
+    }
+
+    @Override
+    public ArticleStatsVO getArticleStats() {
+        ArticleStatsVO stats = new ArticleStatsVO();
+
+        // 文章总数
+        Long totalArticles = articleMapper.selectCount(
+                new LambdaQueryWrapper<Article>().eq(Article::getDeleted, 0)
+        );
+        stats.setTotalArticles(totalArticles);
+
+        // 已发布文章数
+        Long publishedArticles = articleMapper.selectCount(
+                new LambdaQueryWrapper<Article>()
+                        .eq(Article::getDeleted, 0)
+                        .eq(Article::getStatus, Constants.ARTICLE_STATUS_PUBLISHED)
+        );
+        stats.setPublishedArticles(publishedArticles);
+
+        // 草稿文章数
+        Long draftArticles = articleMapper.selectCount(
+                new LambdaQueryWrapper<Article>()
+                        .eq(Article::getDeleted, 0)
+                        .eq(Article::getStatus, Constants.ARTICLE_STATUS_DRAFT)
+        );
+        stats.setDraftArticles(draftArticles);
+
+        // 总浏览量
+        Long totalViews = articleMapper.selectTotalViewCount();
+        stats.setTotalViews(totalViews != null ? totalViews : 0L);
+
+        // 分类数量
+        Long categoryCount = categoryMapper.selectCount(
+                new LambdaQueryWrapper<Category>()
+        );
+        stats.setCategoryCount(categoryCount);
+
+        return stats;
     }
 
 }

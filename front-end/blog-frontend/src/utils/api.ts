@@ -1,5 +1,10 @@
 // API 基础配置
-const API_BASE_URL = import.meta.env.API_BASE_URL || '/api/v1';
+// SSR 模式下服务端需要直接请求后端，浏览器端通过 Nginx 代理
+const API_BASE_URL = import.meta.env.API_BASE_URL || (
+  typeof window === 'undefined'
+    ? 'http://127.0.0.1:8080/api/v1'  // SSR 服务端直接请求后端
+    : '/api/v1'  // 浏览器端通过 Nginx 代理转发
+);
 
 // 统一响应结构
 interface ApiResponse<T> {
@@ -8,13 +13,13 @@ interface ApiResponse<T> {
   data: T;
 }
 
-// 分页响应
+// 分页响应（适配后端 PageResult 结构）
 interface PageResponse<T> {
-  list: T[];
+  records: T[];      // 后端返回 records
   total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
+  current: number;   // 后端返回 current
+  size: number;      // 后端返回 size
+  pages: number;     // 后端返回 pages
 }
 
 // 文章类型
@@ -60,7 +65,6 @@ async function request<T>(
       defaultHeaders['Authorization'] = `Bearer ${token}`;
     }
   }
-  console.log(`${API_BASE_URL}${url}`)
   const response = await fetch(`${API_BASE_URL}${url}`, {
     ...options,
     headers: {
@@ -122,6 +126,64 @@ export const categoryApi = {
   // 获取分类详情
   getDetail: (id: number) => {
     return request<Category>(`/categories/${id}`);
+  },
+};
+
+// 评论类型
+export interface Comment {
+  id: number;
+  articleId: number;
+  parentId: number | null;
+  replyToId: number | null;
+  nickname: string;
+  email: string | null;
+  content: string;
+  status: number;
+  createTime: string;
+  replyToNickname?: string;
+  replies: Comment[];
+}
+
+// 评论统计类型
+export interface CommentCount {
+  total: number;
+}
+
+// 发表评论请求类型
+export interface CreateCommentRequest {
+  articleId: number;
+  parentId?: number | null;
+  replyToId?: number | null;
+  nickname: string;
+  email: string;
+  content: string;
+}
+
+// 评论 API
+export const commentApi = {
+  // 获取评论列表
+  getComments: (articleId: number, page: number = 1, size: number = 20) => {
+    return request<PageResponse<Comment>>(`/comments/article/${articleId}?page=${page}&size=${size}`);
+  },
+
+  // 获取评论数量
+  getCommentCount: (articleId: number) => {
+    return request<CommentCount>(`/comments/article/${articleId}/count`);
+  },
+
+  // 发表评论
+  createComment: (data: CreateCommentRequest) => {
+    return request<Comment>('/comments', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // 删除评论
+  deleteComment: (id: number) => {
+    return request<void>(`/comments/${id}`, {
+      method: 'DELETE',
+    });
   },
 };
 
