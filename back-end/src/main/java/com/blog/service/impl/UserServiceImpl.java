@@ -36,8 +36,21 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("用户名或密码错误");
         }
 
-        // 验证密码
-        if (!loginDTO.getPassword().equals(user.getPassword())) {
+        // 验证密码 - 前端传的是BCrypt哈希，需要与数据库中的哈希比较
+        // 或者前端传明文，数据库存哈希，用BCrypt.checkpw验证
+        boolean passwordMatch = false;
+        String inputPassword = loginDTO.getPassword();
+        String storedPassword = user.getPassword();
+
+        // 如果输入是BCrypt哈希格式（以$2a$开头），直接比较
+        if (inputPassword.startsWith("$2a$") || inputPassword.startsWith("$2b$")) {
+            passwordMatch = inputPassword.equals(storedPassword);
+        } else {
+            // 否则用BCrypt验证
+            passwordMatch = BCrypt.checkpw(inputPassword, storedPassword);
+        }
+
+        if (!passwordMatch) {
             throw new BusinessException("用户名或密码错误");
         }
 

@@ -1,5 +1,5 @@
 ---
-// 首页 - 文章列表展示
+// 首页 - 具有Awwwards设计风格的作品集展示
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -14,88 +14,108 @@ const categoryId = url.searchParams.get('category') ? parseInt(url.searchParams.
 const pageSize = 10;
 
 // 获取文章列表和分类列表
-// 注意：在 SSR 模式下这里会调用真实 API
-// 静态生成模式下需要使用 mock 数据或 API
 let articles: Article[] = [];
 let categories: Category[] = [];
 let total = 0;
 let totalPages = 1;
 
 try {
-  // 调用 API 获取数据
   const [articlesRes, categoriesRes] = await Promise.all([
     articleApi.getList({ page, pageSize, categoryId }),
     categoryApi.getList()
   ]);
-  articles = articlesRes.data.list;
+  articles = articlesRes.data.records;
   total = articlesRes.data.total;
-  totalPages = articlesRes.data.totalPages;
+  totalPages = articlesRes.data.pages;
   categories = categoriesRes.data;
 } catch (error) {
   console.error('Failed to fetch data:', error);
 }
 
-// 当前选中的分类
 const selectedCategory = categoryId ? categories.find(c => c.id === categoryId) : null;
 ---
 
-<Layout title={selectedCategory ? `${selectedCategory.name} - My Blog` : 'My Blog'}>
+<Layout title={selectedCategory ? `${selectedCategory.name} - Selected Works` : 'Selected Works - Awwwards Designer'}>
   <Header currentPath={Astro.url.pathname} />
 
-  <main class="flex-1 bg-gray-50">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+  <main class="flex-1 bg-white overflow-hidden">
+    <!-- Hero Section (Parallax) -->
+    <section class="min-h-screen w-full flex flex-col justify-center px-4 sm:px-10 md:px-20 relative pt-32 pb-20">
+      <div class="max-w-[1400px] mx-auto w-full relative z-10 flex-1 flex flex-col justify-center">
+        <h1 class="font-serif text-[12vw] leading-[0.9] tracking-tighter text-black uppercase block hero-title" id="parallax-text-1">
+          Awwwards
+        </h1>
+        <h1 class="font-serif text-[12vw] leading-[0.9] tracking-tighter text-black uppercase block text-right hero-title mt-4" id="parallax-text-2">
+          Nominated
+        </h1>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mt-12 md:mt-24 gap-10 md:gap-0">
+          <p class="font-mono text-primary-500 uppercase tracking-widest text-sm md:text-base max-w-sm leading-relaxed">
+            Crafting digital experiences with strict aesthetic precision and dynamic motion.
+          </p>
+          <h1 class="font-serif text-[12vw] leading-[0.9] tracking-tighter text-black uppercase hero-title" id="parallax-text-3">
+            Designer
+          </h1>
+        </div>
+      </div>
+      
+      <!-- Scroll indicator -->
+      <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
+        <span class="font-mono text-xs tracking-widest uppercase mb-4 text-black">Scroll to explore</span>
+        <div class="w-[1px] h-16 bg-black/10 relative overflow-hidden">
+          <div class="w-full h-full bg-primary-500 absolute top-0 left-0 animate-[scrollDown_2s_ease-in-out_infinite]"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-10 md:px-20 py-32">
       <!-- 分类筛选 -->
-      <div class="mb-8">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-sm font-medium text-gray-500 mr-2">分类：</span>
+      <div class="mb-24 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-black/10 pb-10">
+        <h2 class="font-serif text-4xl md:text-6xl text-black mb-10 md:mb-0 tracking-tight">Selected Works</h2>
+        <div class="flex flex-wrap items-center gap-6">
           <a
             href="/"
-            class={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            class={`font-mono text-sm tracking-widest uppercase transition-colors hover-target ${
               !categoryId
-                ? 'bg-primary-500 text-white'
-                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                ? 'text-primary-500 border-b border-primary-500 pb-1'
+                : 'text-black/50 hover:text-black pb-1'
             }`}
           >
-            全部
+            All
           </a>
           {categories.map((category) => (
             <a
               href={`/?category=${category.id}`}
-              class={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              class={`font-mono text-sm tracking-widest uppercase transition-colors hover-target ${
                 categoryId === category.id
-                  ? 'bg-primary-500 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                  ? 'text-primary-500 border-b border-primary-500 pb-1'
+                  : 'text-black/50 hover:text-black pb-1'
               }`}
             >
               {category.name}
-              <span class="ml-1 text-xs opacity-70">({category.articleCount})</span>
             </a>
           ))}
         </div>
       </div>
 
-      <!-- 文章列表 -->
-      {articles.length > 0 ? (
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {articles.map((article) => (
-            <ArticleCard article={article} />
+      <!-- 作品列表 -->
+      {articles?.length > 0 ? (
+        <div class="flex flex-col gap-10">
+          {articles.map((article, index) => (
+            <ArticleCard article={article} index={index} />
           ))}
         </div>
       ) : (
-        <div class="text-center py-16">
-          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <p class="text-gray-500">暂无文章</p>
+        <div class="text-center py-32">
+          <p class="font-mono text-black/50 tracking-widest uppercase text-xl">No works found</p>
           {!categoryId && (
-            <p class="text-gray-400 text-sm mt-2">请检查后端服务是否正常运行</p>
+            <p class="text-primary-500 text-sm mt-4 font-mono">Backend service might be offline.</p>
           )}
         </div>
       )}
 
       <!-- 分页 -->
       {totalPages > 1 && (
-        <div class="mt-8">
+        <div class="mt-20 border-t border-black/10 pt-10">
           <Pagination
             currentPage={page}
             totalPages={totalPages}
@@ -108,3 +128,40 @@ const selectedCategory = categoryId ? categories.find(c => c.id === categoryId) 
 
   <Footer />
 </Layout>
+
+<style>
+  @keyframes scrollDown {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+</style>
+
+<script>
+  // Parallax Scroll Effect
+  const initParallax = () => {
+    const text1 = document.getElementById('parallax-text-1');
+    const text2 = document.getElementById('parallax-text-2');
+    const text3 = document.getElementById('parallax-text-3');
+    
+    const handleScroll = () => {
+      const scrolled = window.scrollY;
+      
+      // Move left to right
+      if (text1) text1.style.transform = `translateX(${scrolled * 0.15}px)`;
+      // Move right to left
+      if (text2) text2.style.transform = `translateX(${scrolled * -0.2}px)`;
+      // Move up slightly
+      if (text3) text3.style.transform = `translateY(${scrolled * -0.08}px)`;
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    
+    // Cleanup
+    document.addEventListener('astro:before-swap', () => {
+      window.removeEventListener('scroll', handleScroll);
+    });
+  };
+
+  initParallax();
+  document.addEventListener('astro:page-load', initParallax);
+</script>

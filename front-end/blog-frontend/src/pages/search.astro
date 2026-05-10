@@ -21,9 +21,9 @@ let totalPages = 1;
 if (keyword) {
   try {
     const res = await articleApi.search(keyword, page, pageSize);
-    articles = res.data.list;
+    articles = res.data.records;
     total = res.data.total;
-    totalPages = res.data.totalPages;
+    totalPages = res.data.pages;
   } catch (error) {
     console.error('Search failed:', error);
   }

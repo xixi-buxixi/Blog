@@ -6,6 +6,7 @@ import com.blog.dto.ArticleDTO;
 import com.blog.dto.ArticleQueryDTO;
 import com.blog.service.ArticleService;
 import com.blog.vo.ArticleListVO;
+import com.blog.vo.ArticleStatsVO;
 import com.blog.vo.ArticleVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,6 +37,16 @@ public class ArticleController {
     public Result<PageResult<ArticleListVO>> getArticleList(ArticleQueryDTO queryDTO) {
         PageResult<ArticleListVO> pageResult = articleService.getArticleList(queryDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 文章统计数据
+     */
+    @GetMapping("/stats")
+    @Operation(summary = "文章统计数据")
+    public Result<ArticleStatsVO> getArticleStats() {
+        ArticleStatsVO stats = articleService.getArticleStats();
+        return Result.success(stats);
     }
 
     /**

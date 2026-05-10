@@ -51,7 +51,7 @@ function Layout() {
     }
     removeToken()
     message.success('退出成功')
-    navigate('/login')
+    window.location.href = '/login'
   }
 
   const userMenuItems = [

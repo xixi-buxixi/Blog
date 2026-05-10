@@ -20,14 +20,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor)
-                .addPathPatterns("/api/v1/**")
-                .excludePathPatterns(
-                        "/api/v1/auth/login",
-                        "/api/v1/auth/encode",
-                        "/api/v1/articles",
-                        "/api/v1/articles/*",
-                        "/api/v1/categories"
-                );
+                .addPathPatterns("/api/v1/**");
+        // 注意：公开路径的认证逻辑已在 JwtInterceptor 中处理
     }
 
 }

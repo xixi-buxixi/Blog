@@ -27,7 +27,8 @@ const Login: React.FC = () => {
       });
 
       message.success('登录成功');
-      setAuth(res.data.token, res.data.user);
+      // 后端返回 {token, userInfo, ...}
+      setAuth(res.data.token, res.data.userInfo);
       navigate('/dashboard');
     } catch (error) {
       // 错误已在请求拦截器中处理

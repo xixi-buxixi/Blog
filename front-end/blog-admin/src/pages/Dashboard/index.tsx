@@ -30,7 +30,7 @@ const Dashboard: React.FC = () => {
         getCategoryList(),
       ]);
 
-      const articles = articlesRes.data.list;
+      const articles = articlesRes.data.records;
       setArticleCount(articlesRes.data.total);
       setPublishedCount(articles.filter((a) => a.status === 1).length);
       setTotalViews(articles.reduce((sum, a) => sum + (a.viewCount || 0), 0));

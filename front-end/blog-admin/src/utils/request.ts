@@ -10,19 +10,19 @@ export interface ApiResponse<T = unknown> {
   data: T;
 }
 
-// 分页响应
+// 分页响应（适配后端 PageResult 结构）
 export interface PageResponse<T> {
-  list: T[];
+  records: T[];
   total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
+  current: number;
+  size: number;
+  pages: number;
 }
 
 // 创建 axios 实例
 const instance: AxiosInstance = axios.create({
   baseURL: '/api/v1',
-  timeout: 15000,
+  timeout: 60000, // 60秒，支持大文件解析
   headers: {
     'Content-Type': 'application/json',
   },

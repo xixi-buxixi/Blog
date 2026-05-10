@@ -20,7 +20,7 @@ let archiveData: ArchiveGroup[] = [];
 try {
   // 获取所有文章进行归档
   const res = await articleApi.getList({ page: 1, pageSize: 100 });
-  const articles = res.data.list;
+  const articles = res.data.records;
 
   // 按年月分组
   const groupedByYear = articles.reduce((acc, article) => {

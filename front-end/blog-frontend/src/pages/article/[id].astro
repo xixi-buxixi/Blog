@@ -3,6 +3,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
+import CommentSection from '../../components/CommentSection.astro';
 import { articleApi, type Article } from '../../utils/api';
 
 // 获取文章 ID
@@ -104,6 +105,11 @@ const highlightCode = (code: string, lang: string) => {
           </div>
         </div>
 
+        <!-- 评论区 -->
+        <div data-article-id={articleId}>
+          <CommentSection articleId={articleId} />
+        </div>
+
         <!-- 文章底部 -->
         <footer class="mt-8 flex items-center justify-between">
           <a
@@ -141,34 +147,74 @@ const highlightCode = (code: string, lang: string) => {
 </Layout>
 
 {article && (
-  <script>
-    import hljs from 'highlight.js';
-    import { marked } from 'marked';
-    import DOMPurify from 'dompurify';
+  <script define:vars={{ article }}>
+    // 使用 CDN 加载库，避免裸模块名导入问题
+    const renderMarkdown = async () => {
+      // 从 CDN 动态加载库
+      const loadScript = (url) => {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = url;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      };
 
-    // 配置 marked
-    marked.setOptions({
-      highlight: function(code: string, lang: string) {
-        if (lang && hljs.getLanguage(lang)) {
+      // 加载必要的库
+      try {
+        await Promise.all([
+          loadScript('https://cdn.jsdelivr.net/npm/marked/marked.min.js'),
+          loadScript('https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js'),
+          loadScript('https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js')
+        ]);
+
+        // 加载常用语言包
+        const languages = ['javascript', 'typescript', 'python', 'java', 'go', 'rust',
+                           'css', 'json', 'sql', 'bash', 'markdown', 'yaml'];
+        for (const lang of languages) {
           try {
-            return hljs.highlight(code, { language: lang }).value;
+            await loadScript(`https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/${lang}.min.js`);
           } catch (e) {
-            console.error(e);
+            // 语言包不存在则跳过
           }
         }
-        return hljs.highlightAuto(code).value;
-      },
-      breaks: true,
-      gfm: true,
-    });
 
-    // 渲染 Markdown
-    const contentEl = document.getElementById('article-content');
-    if (contentEl) {
-      const rawContent = contentEl.dataset.content || '';
-      const html = marked(rawContent);
-      const cleanHtml = DOMPurify.sanitize(html);
-      contentEl.innerHTML = cleanHtml;
-    }
+        // 配置 marked
+        marked.setOptions({
+          highlight: function(code, lang) {
+            if (lang && hljs.getLanguage(lang)) {
+              try {
+                return hljs.highlight(code, { language: lang }).value;
+              } catch (e) {
+                console.error(e);
+              }
+            }
+            return hljs.highlightAuto(code).value;
+          },
+          breaks: true,
+          gfm: true,
+        });
+
+        // 渲染 Markdown
+        const contentEl = document.getElementById('article-content');
+        if (contentEl) {
+          const rawContent = contentEl.dataset.content || '';
+          const html = marked.parse(rawContent);
+          const cleanHtml = DOMPurify.sanitize(html);
+          contentEl.innerHTML = cleanHtml;
+        }
+      } catch (e) {
+        console.error('Failed to load markdown libraries:', e);
+        // 显示原始内容作为后备
+        const contentEl = document.getElementById('article-content');
+        if (contentEl) {
+          contentEl.textContent = contentEl.dataset.content || '';
+        }
+      }
+    };
+
+    // 页面加载完成后执行
+    renderMarkdown();
   </script>
 )}

@@ -21,7 +21,11 @@ function Dashboard() {
   const fetchStats = async () => {
     try {
       const res = await getArticleStats()
-      setStats(res)
+      setStats({
+        articleCount: res.totalArticles || 0,
+        categoryCount: res.categoryCount || 0,
+        totalViews: res.totalViews || 0
+      })
     } catch (e) {
       // 使用默认数据
     }

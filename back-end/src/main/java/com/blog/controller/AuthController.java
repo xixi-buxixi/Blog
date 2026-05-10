@@ -34,8 +34,7 @@ public class AuthController {
     public Result<String> encodePassword(@RequestParam String password) {
         String hash = BCrypt.hashpw(password, BCrypt.gensalt());
         log.info("密码 {} 的BCrypt哈希: {}", password, hash);
-        String code="$2a$2a$2a$10$mDsdZtNxL4krM7oeBwayUevTQSFWs6wPLccCzcZboWn2Q4kS61P7q";
-        return Result.success(code);
+        return Result.success(hash);
     }
 
     /**

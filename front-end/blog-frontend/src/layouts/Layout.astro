@@ -16,10 +16,71 @@ const { title = 'My Blog', description = 'A personal blog built with Astro' } = 
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
     <title>{title}</title>
   </head>
-  <body class="min-h-screen flex flex-col">
+  <body class="min-h-screen flex flex-col bg-white text-black relative">
+    <!-- Custom Cursor -->
+    <div id="custom-cursor" class="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-primary-500 pointer-events-none z-[100] transition-transform duration-100 ease-out flex items-center justify-center mix-blend-difference" style="transform: translate(-50%, -50%);"></div>
+    <div id="custom-cursor-dot" class="fixed top-0 left-0 w-2 h-2 bg-primary-500 rounded-full pointer-events-none z-[100]" style="transform: translate(-50%, -50%);"></div>
+    
     <slot />
+
+    <script>
+      // Custom Cursor Logic
+      const cursor = document.getElementById('custom-cursor');
+      const cursorDot = document.getElementById('custom-cursor-dot');
+      
+      let mouseX = -100;
+      let mouseY = -100;
+      
+      let cursorX = -100;
+      let cursorY = -100;
+      
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        if (cursorDot) {
+          cursorDot.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
+        }
+      });
+      
+      const animateCursor = () => {
+        let dx = mouseX - cursorX;
+        let dy = mouseY - cursorY;
+        
+        cursorX += dx * 0.15;
+        cursorY += dy * 0.15;
+        
+        if (cursor) {
+          cursor.style.transform = `translate(${cursorX - 16}px, ${cursorY - 16}px)`;
+        }
+        
+        requestAnimationFrame(animateCursor);
+      };
+      
+      animateCursor();
+      
+      // Update hover logic when navigating
+      const updateHoverEffects = () => {
+        const interactables = document.querySelectorAll('a, button, input, .hover-target');
+        interactables.forEach(el => {
+          el.addEventListener('mouseenter', () => {
+            if (cursor) cursor.classList.add('scale-150', 'bg-primary-500', 'opacity-50');
+          });
+          el.addEventListener('mouseleave', () => {
+            if (cursor) cursor.classList.remove('scale-150', 'bg-primary-500', 'opacity-50');
+          });
+        });
+      };
+
+      // Run initially and on view transitions if used
+      updateHoverEffects();
+      document.addEventListener('astro:page-load', updateHoverEffects);
+    </script>
   </body>
 </html>
 

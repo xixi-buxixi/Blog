@@ -4,6 +4,7 @@ import com.blog.common.PageResult;
 import com.blog.dto.ArticleDTO;
 import com.blog.dto.ArticleQueryDTO;
 import com.blog.vo.ArticleListVO;
+import com.blog.vo.ArticleStatsVO;
 import com.blog.vo.ArticleVO;
 
 /**
@@ -51,5 +52,12 @@ public interface ArticleService {
      * @param id 文章ID
      */
     void deleteArticle(Long id);
+
+    /**
+     * 获取文章统计数据
+     *
+     * @return 统计数据
+     */
+    ArticleStatsVO getArticleStats();
 
 }

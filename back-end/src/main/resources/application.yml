@@ -13,6 +13,10 @@ spring:
     time-zone: GMT+8
     serialization:
       write-dates-as-timestamps: false
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 # MyBatis-Plus配置
 mybatis-plus:
@@ -41,3 +45,10 @@ logging:
   level:
     com.blog: debug
     com.blog.mapper: debug
+
+# 应用配置
+app:
+  upload:
+    path: uploads
+  server:
+    url: http://localhost:8080

@@ -64,4 +64,11 @@ public interface ArticleMapper extends BaseMapper<Article> {
      */
     void incrementViewCount(@Param("id") Long id);
 
+    /**
+     * 查询总浏览量
+     *
+     * @return 总浏览量
+     */
+    Long selectTotalViewCount();
+
 }
