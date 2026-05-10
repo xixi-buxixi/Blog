@@ -6,17 +6,6 @@ interface Props {
 
 const { currentPath = '' } = Astro.props;
 
-const navItems = [
-  { href: '/', label: 'HOME' },
-  { href: '/archive', label: 'ARTICLES' },
-  { href: '/about', label: 'ABOUT' },
-  { href: '/search', label: 'SEARCH' },
-];
-
-const isActive = (href: string) => {
-  if (href === '/') return currentPath === '/';
-  return currentPath.startsWith(href);
-};
 ---
 
 <nav class="sticky top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex justify-between items-center transition-transform duration-300" id="navbar">
@@ -24,20 +13,6 @@ const isActive = (href: string) => {
     <a href="/" class="font-sans font-bold text-2xl tracking-tight text-slate-900">
       TECH<span class="text-slate-400 font-light">::minimal</span>
     </a>
-    <div class="hidden md:flex font-sans text-sm font-medium gap-8 text-slate-500">
-      {navItems.map((item) => (
-        <a
-          href={item.href}
-          class={`transition-colors py-1 ${
-            isActive(item.href)
-              ? 'text-slate-900 border-b-2 border-slate-900'
-              : 'hover:text-slate-900'
-          }`}
-        >
-          {item.label}
-        </a>
-      ))}
-    </div>
   </div>
   
   <div class="flex items-center gap-4">
@@ -52,48 +27,10 @@ const isActive = (href: string) => {
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
       </svg>
     </button>
-    
-    <button class="md:hidden text-slate-500 hover:text-slate-900" id="mobile-menu-btn" aria-label="Toggle Menu">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-    </button>
   </div>
 </nav>
 
-<!-- Mobile Navigation -->
-<div id="mobile-menu" class="hidden fixed inset-0 z-40 bg-white/95 backdrop-blur-xl pt-24 px-6 md:hidden">
-  <nav class="flex flex-col gap-6 font-sans font-medium text-lg text-slate-600">
-    {navItems.map((item) => (
-      <a
-        href={item.href}
-        class={`block py-2 border-b border-slate-100 ${
-          isActive(item.href)
-            ? 'text-slate-900'
-            : 'hover:text-slate-900'
-        }`}
-      >
-        {item.label}
-      </a>
-    ))}
-  </nav>
-</div>
-
 <script>
-  // Mobile Menu Logic
-  const initMenu = () => {
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    const toggleMenu = () => {
-      mobileMenu?.classList.toggle('hidden');
-    };
-
-    menuBtn?.addEventListener('click', toggleMenu);
-
-    return () => {
-      menuBtn?.removeEventListener('click', toggleMenu);
-    };
-  };
-
   // Navbar hide/show on scroll
   const initNavbarScroll = () => {
     let lastScroll = 0;
@@ -144,12 +81,10 @@ const isActive = (href: string) => {
     };
   };
 
-  let cleanupMenu: (() => void) | undefined;
   let cleanupScroll: (() => void) | undefined;
   let cleanupTheme: (() => void) | undefined;
 
   const init = () => {
-    cleanupMenu = initMenu();
     cleanupScroll = initNavbarScroll();
     cleanupTheme = initThemeToggle();
   };
@@ -157,7 +92,6 @@ const isActive = (href: string) => {
   init();
 
   document.addEventListener('astro:page-load', () => {
-    if(cleanupMenu) cleanupMenu();
     if(cleanupScroll) cleanupScroll();
     if(cleanupTheme) cleanupTheme();
     init();

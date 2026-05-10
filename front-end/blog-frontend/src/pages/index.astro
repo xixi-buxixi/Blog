@@ -1,147 +1,131 @@
 ---
+// 首页 - 极简阅读风格
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import Pagination from '../components/Pagination.astro';
+import { articleApi, categoryApi, type Article, type Category } from '../utils/api';
 
-// Dummy data for the presentation
-const author = {
-  name: 'Alex Developer',
-  bio: 'Frontend Architect & UI Enthusiast',
-  avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d'
-};
+// 获取查询参数
+const url = new URL(Astro.request.url);
+const page = parseInt(url.searchParams.get('page') || '1');
+const categoryId = url.searchParams.get('category') ? parseInt(url.searchParams.get('category')!) : undefined;
+const pageSize = 10;
 
-const post = {
-  title: 'BUILDING REACT APPS WITH HOOKS & CONTEXT API',
-  date: 'OCT 24, 2023',
-  readTime: '8 MIN READ',
-  content: `
-    <p>React Hooks completely transformed how we build components by allowing us to use state and other React features without writing a class. When combined with the Context API, you can manage global state in a clean, minimal way that avoids the boilerplate of external libraries like Redux for many use cases.</p>
-    
-    <h3>The Power of useState and useEffect</h3>
-    <p>The most common hooks you'll use are <code>useState</code> for local state management and <code>useEffect</code> for side effects like data fetching or DOM manipulation.</p>
-    
-    <pre><code class="language-jsx hljs">
-<span class="hljs-keyword">import</span> React, { useState, useEffect } <span class="hljs-keyword">from</span> <span class="hljs-string">'react'</span>;
+// 获取文章列表和分类列表
+let articles: Article[] = [];
+let categories: Category[] = [];
+let total = 0;
+let totalPages = 1;
 
-<span class="hljs-keyword">function</span> <span class="hljs-title">UserProfile</span>({ userId }) {
-  <span class="hljs-keyword">const</span> [user, setUser] = <span class="hljs-title">useState</span>(<span class="hljs-literal">null</span>);
-  <span class="hljs-keyword">const</span> [loading, setLoading] = <span class="hljs-title">useState</span>(<span class="hljs-literal">true</span>);
-
-  <span class="hljs-title">useEffect</span>(() => {
-    <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title">fetchUser</span>() {
-      <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title">fetch</span>(<span class="hljs-string">\`/api/users/\${userId}\`</span>);
-      <span class="hljs-keyword">const</span> data = <span class="hljs-keyword">await</span> response.<span class="hljs-title">json</span>();
-      <span class="hljs-title">setUser</span>(data);
-      <span class="hljs-title">setLoading</span>(<span class="hljs-literal">false</span>);
-    }
-    <span class="hljs-title">fetchUser</span>();
-  }, [userId]);
-
-  <span class="hljs-keyword">if</span> (loading) <span class="hljs-keyword">return</span> &lt;<span class="hljs-tag">div</span>&gt;Loading...&lt;/<span class="hljs-tag">div</span>&gt;;
-  <span class="hljs-keyword">return</span> &lt;<span class="hljs-tag">div</span>&gt;{user.name}&lt;/<span class="hljs-tag">div</span>&gt;;
+try {
+  const [articlesRes, categoriesRes] = await Promise.all([
+    articleApi.getList({ page, pageSize, categoryId }),
+    categoryApi.getList()
+  ]);
+  articles = articlesRes.data.records || [];
+  total = articlesRes.data.total || 0;
+  totalPages = articlesRes.data.pages || 1;
+  categories = categoriesRes.data || [];
+} catch (error) {
+  console.error('Failed to fetch data:', error);
 }
-    </code></pre>
-    
-    <h3>Global State with Context</h3>
-    <p>For state that needs to be accessed by many components at different nesting levels, Context API provides a way to pass data through the component tree without having to pass props down manually at every level.</p>
-  `
-};
 
-const categories = ['Frontend Development', 'React', 'Architecture', 'UI/UX Design', 'Performance'];
-const tags = ['JavaScript', 'Hooks', 'Context', 'Web', 'React Native', 'TypeScript', 'CSS-in-JS'];
+const selectedCategory = categoryId ? categories.find(c => c.id === categoryId) : null;
+
+// Author Info
+const author = {
+  name: 'lililiz',
+  bio: '全栈工程师 & AI应用工程师',
+  avatar: '/images/image.png',
+  intro: '一个热爱技术与创造的开发者，专注于 Java 后端、AI 应用与智能 Agent 系统方向。正在探索如何让 AI 不只是“回答问题”，而是真正具备长期记忆、自主行为与成长能力。
+擅长 Spring Boot、Spring Cloud、Redis、MySQL 等后端技术栈，同时也在深入研究大模型、向量数据库、Agent 架构、Prompt Engineering 与 AI 系统设计。热衷于将复杂技术拆解为通俗易懂的内容，对底层原理、系统架构与工程实践保持持续探索。
+目前正在构建多个 AI 与 Agent 相关项目，包括具备自主发帖、评论、成长机制的 AI 社区，以及融合天气监测、风险预警与智能助手的环境预警系统。喜欢把“想法”真正落地成可运行的产品。相信技术不仅是代码，更是一种创造未来的能力。热爱学习，持续折腾，长期主义者。
+'
+};
 ---
 
-<Layout title="TECH::minimal | React Hooks & Context">
-  <Header currentPath="/" />
-  
-  <main class="max-w-7xl mx-auto px-6 pt-32 pb-24">
+<Layout title={selectedCategory ? `${selectedCategory.name} - TECH::minimal` : 'TECH::minimal | Blog'}>
+  <Header currentPath={Astro.url.pathname} />
+
+  <main class="max-w-6xl mx-auto px-6 pt-24 pb-20">
+    
+    <!-- Profile Section -->
+    <section class="mb-20 max-w-3xl">
+      <div class="flex items-center gap-6 mb-6">
+        <img src={author.avatar} alt={author.name} class="w-20 h-20 rounded-full border border-slate-200 shadow-sm" />
+        <div>
+          <h1 class="text-3xl font-sans font-bold text-slate-900">{author.name}</h1>
+          <p class="text-slate-500 font-sans text-lg">{author.bio}</p>
+        </div>
+      </div>
+      <p class="text-slate-700 leading-relaxed font-serif text-lg">
+        {author.intro}
+      </p>
+    </section>
+
     <div class="flex flex-col lg:flex-row gap-16">
       
-      <!-- Central Content Area -->
-      <article class="flex-1 max-w-3xl">
-        <header class="mb-10">
-          <h1 class="text-4xl md:text-5xl font-sans font-bold text-slate-900 leading-tight mb-8 tracking-tight uppercase">
-            {post.title}
-          </h1>
-          
-          <div class="flex items-center justify-between border-t border-b border-slate-100 py-4">
-            <div class="flex items-center gap-4">
-              <img src={author.avatar} alt={author.name} class="w-12 h-12 rounded-full border border-slate-200" />
-              <div>
-                <div class="font-sans font-semibold text-slate-900">{author.name}</div>
-                <div class="text-sm text-slate-500 font-sans">{author.bio}</div>
-              </div>
-            </div>
-            <div class="text-right font-sans text-sm text-slate-500">
-              <div class="font-medium text-slate-900">{post.date}</div>
-              <div>{post.readTime}</div>
-            </div>
-          </div>
-        </header>
-        
-        <div class="prose prose-lg max-w-none" set:html={post.content}></div>
-      </article>
-
-      <!-- Right Sidebar -->
-      <aside class="w-full lg:w-80 flex flex-col gap-10">
-        
-        <!-- Subscribe Form -->
-        <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 shadow-sm">
-          <h3 class="font-sans font-bold text-slate-900 mb-2 uppercase tracking-wide">Subscribe to Newsletter</h3>
-          <p class="text-slate-600 font-sans text-sm mb-4">Get the latest articles and tutorials delivered straight to your inbox.</p>
-          <form class="flex flex-col gap-3" onsubmit="event.preventDefault();">
-            <input 
-              type="email" 
-              placeholder="Your email address" 
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-sans bg-white text-slate-800"
-              required
-            />
-            <button 
-              type="submit" 
-              class="w-full bg-slate-900 hover:bg-slate-800 text-white font-sans font-medium py-2 rounded-lg transition-colors cursor-pointer"
-            >
-              SUBSCRIBE
-            </button>
-          </form>
+      <!-- Articles List (Main Content) -->
+      <div class="flex-1">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-8">
+          <h2 class="font-sans text-2xl font-bold text-slate-900">
+            {selectedCategory ? `Category: ${selectedCategory.name}` : 'Latest Articles'}
+          </h2>
+          <span class="text-slate-500 font-sans text-sm">{total} Posts</span>
         </div>
 
-        <!-- Categories -->
-        <div>
-          <h3 class="font-sans font-bold text-slate-900 mb-4 uppercase tracking-wide flex items-center gap-2">
-            <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+        {articles?.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {articles.map((article, index) => (
+              <ArticleCard article={article} index={index} />
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-20 bg-slate-50 rounded-xl border border-slate-100">
+            <p class="font-sans text-slate-500 text-lg">No articles found.</p>
+          </div>
+        )}
+
+        <!-- Pagination -->
+        {totalPages > 1 && (
+          <div class="mt-16 border-t border-slate-200 pt-8">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              baseUrl={categoryId ? `/?category=${categoryId}` : '/'}
+            />
+          </div>
+        )}
+      </div>
+
+      <!-- Right Sidebar (Categories) -->
+      <aside class="w-full lg:w-72">
+        <div class="sticky top-32">
+          <h3 class="font-sans font-bold text-slate-900 mb-6 uppercase tracking-wide flex items-center gap-2">
+            <span class="w-2 h-2 bg-slate-900 rounded-full"></span>
             Categories
           </h3>
           <ul class="flex flex-col gap-2 font-sans">
+            <li>
+              <a href="/" class={`transition-all inline-block flex w-full items-center justify-between border-b border-slate-100 pb-3 ${!categoryId ? 'text-blue-600 font-medium' : 'text-slate-600 hover:text-slate-900 hover:translate-x-1'}`}>
+                <span>All Articles</span>
+              </a>
+            </li>
             {categories.map(cat => (
               <li>
-                <a href={`/category/${cat.toLowerCase()}`} class="text-slate-600 hover:text-blue-600 hover:translate-x-1 transition-all inline-block flex w-full items-center justify-between border-b border-slate-100 pb-2">
-                  <span>{cat}</span>
-                  <span class="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">12</span>
+                <a href={`/?category=${cat.id}`} class={`transition-all inline-block flex w-full items-center justify-between border-b border-slate-100 pb-3 ${categoryId === cat.id ? 'text-blue-600 font-medium' : 'text-slate-600 hover:text-slate-900 hover:translate-x-1'}`}>
+                  <span>{cat.name}</span>
                 </a>
               </li>
             ))}
           </ul>
         </div>
-
-        <!-- Tags Word Cloud -->
-        <div>
-          <h3 class="font-sans font-bold text-slate-900 mb-4 uppercase tracking-wide flex items-center gap-2">
-            <span class="w-2 h-2 bg-orange-500 rounded-full"></span>
-            Tags
-          </h3>
-          <div class="flex flex-wrap gap-2 font-sans">
-            {tags.map(tag => (
-              <a 
-                href={`/tag/${tag.toLowerCase()}`} 
-                class="px-3 py-1 bg-slate-100 border border-slate-200 text-slate-600 text-sm rounded-md hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"
-              >
-                {tag}
-              </a>
-            ))}
-          </div>
-        </div>
-
       </aside>
       
     </div>
   </main>
+
+  <Footer />
 </Layout>
