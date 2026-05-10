@@ -1,5 +1,5 @@
 ---
-// 首页 - 具有Awwwards设计风格的作品集展示
+// 首页 - SYS.LOG 风格
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -11,7 +11,7 @@ import { articleApi, categoryApi, type Article, type Category } from '../utils/a
 const url = new URL(Astro.request.url);
 const page = parseInt(url.searchParams.get('page') || '1');
 const categoryId = url.searchParams.get('category') ? parseInt(url.searchParams.get('category')!) : undefined;
-const pageSize = 10;
+const pageSize = 9;
 
 // 获取文章列表和分类列表
 let articles: Article[] = [];
@@ -35,49 +35,64 @@ try {
 const selectedCategory = categoryId ? categories.find(c => c.id === categoryId) : null;
 ---
 
-<Layout title={selectedCategory ? `${selectedCategory.name} - Selected Works` : 'Selected Works - Awwwards Designer'}>
+<Layout title={selectedCategory ? `${selectedCategory.name} - SYS.LOG` : 'SYS.LOG | Engineering Blog'}>
   <Header currentPath={Astro.url.pathname} />
 
-  <main class="flex-1 bg-white overflow-hidden">
-    <!-- Hero Section (Parallax) -->
-    <section class="min-h-screen w-full flex flex-col justify-center px-4 sm:px-10 md:px-20 relative pt-32 pb-20">
-      <div class="max-w-[1400px] mx-auto w-full relative z-10 flex-1 flex flex-col justify-center">
-        <h1 class="font-serif text-[12vw] leading-[0.9] tracking-tighter text-black uppercase block hero-title" id="parallax-text-1">
-          Awwwards
-        </h1>
-        <h1 class="font-serif text-[12vw] leading-[0.9] tracking-tighter text-black uppercase block text-right hero-title mt-4" id="parallax-text-2">
-          Nominated
-        </h1>
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mt-12 md:mt-24 gap-10 md:gap-0">
-          <p class="font-mono text-primary-500 uppercase tracking-widest text-sm md:text-base max-w-sm leading-relaxed">
-            Crafting digital experiences with strict aesthetic precision and dynamic motion.
-          </p>
-          <h1 class="font-serif text-[12vw] leading-[0.9] tracking-tighter text-black uppercase hero-title" id="parallax-text-3">
-            Designer
-          </h1>
+  <main class="flex-1 w-full pt-32 pb-20">
+    
+    <!-- Hero Section -->
+    <header class="max-w-6xl mx-auto px-6 mb-32 relative">
+      <div class="flex flex-col gap-6 relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-mono w-max backdrop-blur-sm">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+          </span>
+          LATEST: ARCHITECTURE PATTERNS 2026
         </div>
+        
+        <h1 class="font-display text-5xl md:text-8xl font-bold leading-[1.1] tracking-tighter reveal-text">
+          <span>Engineering</span><br/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary animate-gradient-x">Beyond Limits.</span>
+        </h1>
+        
+        <p class="text-zinc-400 text-lg md:text-xl max-w-2xl font-light leading-relaxed mt-4">
+          Deep dives into systems design, performance optimization, and the bleeding edge of web technologies. Written for engineers, by engineers.
+        </p>
       </div>
       
-      <!-- Scroll indicator -->
-      <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
-        <span class="font-mono text-xs tracking-widest uppercase mb-4 text-black">Scroll to explore</span>
-        <div class="w-[1px] h-16 bg-black/10 relative overflow-hidden">
-          <div class="w-full h-full bg-primary-500 absolute top-0 left-0 animate-[scrollDown_2s_ease-in-out_infinite]"></div>
-        </div>
+      <!-- Decorative Code Element -->
+      <div class="absolute right-0 top-0 hidden lg:block w-96 h-96 opacity-20 pointer-events-none animate-float select-none">
+        <pre class="text-xs font-mono text-secondary leading-tight">
+<span class="text-primary">function</span> <span class="text-white">optimize</span>(system) {'{'}
+  <span class="text-primary">while</span> (system.isRunning) {'{'}
+    <span class="text-zinc-500">// Check bottlenecks</span>
+    <span class="text-primary">const</span> metric = system.analyze();
+    
+    <span class="text-primary">if</span> (metric.latency > THRESHOLD) {'{'}
+      system.scale(strategy.DISTRIBUTED);
+      system.cache.invalidate();
+    {'}'}
+    
+    <span class="text-primary">await</span> system.tick();
+  {'}'}
+{'}'}
+        </pre>
       </div>
-    </section>
+    </header>
 
-    <div class="max-w-[1400px] mx-auto px-4 sm:px-10 md:px-20 py-32">
-      <!-- 分类筛选 -->
-      <div class="mb-24 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-black/10 pb-10">
-        <h2 class="font-serif text-4xl md:text-6xl text-black mb-10 md:mb-0 tracking-tight">Selected Works</h2>
-        <div class="flex flex-wrap items-center gap-6">
+    <!-- Articles Section -->
+    <section class="max-w-6xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-6 gap-6">
+        <h2 class="font-display text-3xl font-bold">Recent Dispatches</h2>
+        
+        <div class="flex flex-wrap items-center gap-4">
           <a
             href="/"
-            class={`font-mono text-sm tracking-widest uppercase transition-colors hover-target ${
+            class={`font-mono text-xs tracking-widest uppercase transition-colors hover-trigger px-3 py-1.5 rounded-full border ${
               !categoryId
-                ? 'text-primary-500 border-b border-primary-500 pb-1'
-                : 'text-black/50 hover:text-black pb-1'
+                ? 'border-primary text-primary bg-primary/10'
+                : 'border-white/10 text-zinc-400 hover:text-white hover:border-white/30'
             }`}
           >
             All
@@ -85,10 +100,10 @@ const selectedCategory = categoryId ? categories.find(c => c.id === categoryId) 
           {categories.map((category) => (
             <a
               href={`/?category=${category.id}`}
-              class={`font-mono text-sm tracking-widest uppercase transition-colors hover-target ${
+              class={`font-mono text-xs tracking-widest uppercase transition-colors hover-trigger px-3 py-1.5 rounded-full border ${
                 categoryId === category.id
-                  ? 'text-primary-500 border-b border-primary-500 pb-1'
-                  : 'text-black/50 hover:text-black pb-1'
+                  ? 'border-secondary text-secondary bg-secondary/10'
+                  : 'border-white/10 text-zinc-400 hover:text-white hover:border-white/30'
               }`}
             >
               {category.name}
@@ -97,25 +112,25 @@ const selectedCategory = categoryId ? categories.find(c => c.id === categoryId) 
         </div>
       </div>
 
-      <!-- 作品列表 -->
+      <!-- Article Grid -->
       {articles?.length > 0 ? (
-        <div class="flex flex-col gap-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.map((article, index) => (
             <ArticleCard article={article} index={index} />
           ))}
         </div>
       ) : (
-        <div class="text-center py-32">
-          <p class="font-mono text-black/50 tracking-widest uppercase text-xl">No works found</p>
+        <div class="text-center py-32 glass rounded-2xl">
+          <p class="font-mono text-zinc-500 tracking-widest uppercase text-xl">No dispatches found</p>
           {!categoryId && (
-            <p class="text-primary-500 text-sm mt-4 font-mono">Backend service might be offline.</p>
+            <p class="text-primary text-sm mt-4 font-mono">System might be offline.</p>
           )}
         </div>
       )}
 
-      <!-- 分页 -->
+      <!-- Pagination -->
       {totalPages > 1 && (
-        <div class="mt-20 border-t border-black/10 pt-10">
+        <div class="mt-20 border-t border-white/10 pt-10">
           <Pagination
             currentPage={page}
             totalPages={totalPages}
@@ -123,45 +138,38 @@ const selectedCategory = categoryId ? categories.find(c => c.id === categoryId) 
           />
         </div>
       )}
-    </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="max-w-6xl mx-auto px-6 mt-32">
+      <div class="glass border border-primary/20 rounded-3xl p-8 md:p-16 relative overflow-hidden text-center">
+        <!-- Glows -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-r from-primary/20 to-secondary/20 blur-3xl -z-10 pointer-events-none"></div>
+        
+        <h2 class="font-display text-3xl md:text-5xl font-bold mb-4">Stay in the Loop</h2>
+        <p class="text-zinc-400 max-w-xl mx-auto mb-8">Get deep engineering insights delivered straight to your inbox. No spam, only high-quality technical content.</p>
+        
+        <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto relative z-10" onsubmit="event.preventDefault();">
+          <input type="email" placeholder="jane@company.com" class="flex-1 bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors hover-trigger placeholder:text-zinc-600 font-sans">
+          <button type="submit" class="bg-white text-black font-medium px-6 py-3 rounded-xl hover:bg-zinc-200 transition-colors hover-trigger">Subscribe</button>
+        </form>
+      </div>
+    </section>
   </main>
 
   <Footer />
 </Layout>
 
-<style>
-  @keyframes scrollDown {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100%); }
-  }
-</style>
-
 <script>
-  // Parallax Scroll Effect
-  const initParallax = () => {
-    const text1 = document.getElementById('parallax-text-1');
-    const text2 = document.getElementById('parallax-text-2');
-    const text3 = document.getElementById('parallax-text-3');
-    
-    const handleScroll = () => {
-      const scrolled = window.scrollY;
-      
-      // Move left to right
-      if (text1) text1.style.transform = `translateX(${scrolled * 0.15}px)`;
-      // Move right to left
-      if (text2) text2.style.transform = `translateX(${scrolled * -0.2}px)`;
-      // Move up slightly
-      if (text3) text3.style.transform = `translateY(${scrolled * -0.08}px)`;
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    
-    // Cleanup
-    document.addEventListener('astro:before-swap', () => {
-      window.removeEventListener('scroll', handleScroll);
-    });
+  // Simple text reveal animation on load
+  const initReveal = () => {
+    const reveals = document.querySelectorAll('.reveal-text');
+    // small timeout to ensure css is loaded and transition happens
+    setTimeout(() => {
+      reveals.forEach(r => r.classList.add('active'));
+    }, 100);
   };
-
-  initParallax();
-  document.addEventListener('astro:page-load', initParallax);
+  
+  initReveal();
+  document.addEventListener('astro:page-load', initReveal);
 </script>

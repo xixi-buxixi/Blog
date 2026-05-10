@@ -1,5 +1,5 @@
 ---
-// 搜索页
+// 搜索页 - SYS.LOG 风格
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -11,7 +11,7 @@ import { articleApi, type Article } from '../utils/api';
 const url = new URL(Astro.request.url);
 const keyword = url.searchParams.get('q') || '';
 const page = parseInt(url.searchParams.get('page') || '1');
-const pageSize = 10;
+const pageSize = 9;
 
 // 搜索文章
 let articles: Article[] = [];
@@ -30,55 +30,60 @@ if (keyword) {
 }
 ---
 
-<Layout title={keyword ? `搜索: ${keyword} - My Blog` : '搜索 - My Blog'}>
+<Layout title={keyword ? `Search: ${keyword} | SYS.LOG` : 'Search | SYS.LOG'}>
   <Header currentPath="/search" />
 
-  <main class="flex-1 bg-gray-50">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      <!-- 搜索框 -->
-      <div class="mb-8">
-        <form action="/search" method="get" class="relative">
+  <main class="flex-1 w-full pt-32 pb-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <!-- Search Input -->
+      <div class="mb-16 border-b border-white/10 pb-8 max-w-2xl mx-auto text-center">
+        <h1 class="font-display text-4xl font-bold mb-8">Query Database</h1>
+        <form action="/search" method="get" class="relative group">
           <input
             type="text"
             name="q"
             value={keyword}
-            placeholder="输入关键词搜索文章..."
-            class="w-full px-4 py-3 pl-12 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all shadow-sm"
+            placeholder="Enter search parameters..."
+            class="w-full bg-surface/50 border border-white/10 rounded-2xl px-6 py-4 pl-14 text-white focus:outline-none focus:border-primary focus:bg-surface/80 transition-all shadow-sm hover-trigger font-mono placeholder:text-zinc-600"
+            autocomplete="off"
           />
-          <svg class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 text-zinc-500 absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <button
             type="submit"
-            class="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors"
+            class="absolute right-3 top-1/2 -translate-y-1/2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white text-sm font-mono rounded-xl transition-colors hover-trigger"
           >
-            搜索
+            EXECUTE
           </button>
         </form>
       </div>
 
-      <!-- 搜索结果 -->
+      <!-- Search Results -->
       {keyword && (
-        <div class="mb-4">
-          <p class="text-gray-500">
-            搜索 "<span class="text-gray-900 font-medium">{keyword}</span>" 共找到 <span class="text-primary-600 font-medium">{total}</span> 篇文章
+        <div class="mb-8 font-mono text-sm text-zinc-500 flex items-center justify-between">
+          <p>
+            RESULTS FOR: <span class="text-white">"{keyword}"</span>
+          </p>
+          <p>
+            [<span class="text-primary">{total}</span> RECORDS FOUND]
           </p>
         </div>
       )}
 
-      <!-- 搜索结果列表 -->
+      <!-- Results List -->
       {keyword ? (
         articles.length > 0 ? (
           <>
-            <div class="space-y-6">
-              {articles.map((article) => (
-                <ArticleCard article={article} />
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {articles.map((article, index) => (
+                <ArticleCard article={article} index={index} />
               ))}
             </div>
 
-            <!-- 分页 -->
+            <!-- Pagination -->
             {totalPages > 1 && (
-              <div class="mt-8">
+              <div class="mt-20 border-t border-white/10 pt-10">
                 <Pagination
                   currentPage={page}
                   totalPages={totalPages}
@@ -88,21 +93,19 @@ if (keyword) {
             )}
           </>
         ) : (
-          <div class="bg-white rounded-xl border border-gray-100 p-12 text-center">
-            <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 class="text-lg font-medium text-gray-700 mb-2">未找到相关文章</h3>
-            <p class="text-gray-500">尝试使用其他关键词搜索</p>
+          <div class="glass rounded-2xl p-16 text-center border-dashed border-white/10 mt-8">
+            <p class="font-mono text-zinc-500 text-lg mb-2">0 RESULTS RETURNED</p>
+            <p class="text-zinc-600 font-sans text-sm">Refine your search parameters and try again.</p>
           </div>
         )
       ) : (
-        <div class="bg-white rounded-xl border border-gray-100 p-12 text-center">
-          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <h3 class="text-lg font-medium text-gray-700 mb-2">搜索文章</h3>
-          <p class="text-gray-500">输入关键词搜索你感兴趣的文章</p>
+        <div class="glass rounded-2xl p-16 text-center border-dashed border-white/10 mt-8">
+          <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <p class="font-mono text-zinc-400">AWAITING QUERY INPUT...</p>
         </div>
       )}
     </div>

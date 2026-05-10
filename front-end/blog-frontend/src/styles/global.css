@@ -2,52 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 全局样式 */
 @layer base {
   html {
     scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-white text-black antialiased font-sans cursor-none;
+    @apply bg-background text-zinc-100 antialiased font-sans cursor-none;
     overflow-x: hidden;
   }
   
-  /* Make sure links and buttons also hide default cursor since we use a custom one */
-  a, button, input, textarea, select {
+  a, button, input, textarea, select, .hover-target, .hover-trigger {
     @apply cursor-none;
-  }
-
-  a {
-    @apply transition-colors duration-200;
   }
 
   /* 文章内容样式 */
   .prose {
-    @apply text-gray-700 leading-relaxed;
+    @apply text-zinc-300 leading-relaxed;
   }
 
   .prose h1,
   .prose h2,
   .prose h3,
   .prose h4 {
-    @apply text-gray-900 font-semibold mt-8 mb-4;
+    @apply text-zinc-100 font-display font-semibold mt-8 mb-4 tracking-tight;
   }
 
-  .prose h1 {
-    @apply text-3xl;
-  }
-
-  .prose h2 {
-    @apply text-2xl;
-  }
-
-  .prose h3 {
-    @apply text-xl;
-  }
+  .prose h1 { @apply text-3xl; }
+  .prose h2 { @apply text-2xl; }
+  .prose h3 { @apply text-xl; }
 
   .prose p {
-    @apply my-4 leading-relaxed;
+    @apply my-4 leading-relaxed font-light;
   }
 
   .prose ul,
@@ -55,120 +41,125 @@
     @apply my-4 pl-6;
   }
 
-  .prose ul {
-    @apply list-disc;
-  }
-
-  .prose ol {
-    @apply list-decimal;
-  }
-
-  .prose li {
-    @apply my-2;
-  }
+  .prose ul { @apply list-disc; }
+  .prose ol { @apply list-decimal; }
+  .prose li { @apply my-2; }
 
   .prose blockquote {
-    @apply border-l-4 border-primary-500 pl-4 py-2 my-4 bg-gray-50 text-gray-600 italic;
+    @apply border-l-2 border-primary pl-6 py-2 my-6 bg-surface/50 text-zinc-400 italic rounded-r-lg;
   }
 
   .prose code {
-    @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono text-primary-600;
+    @apply bg-surface px-1.5 py-0.5 rounded text-sm font-mono text-secondary;
   }
 
   .prose pre {
-    @apply my-4 rounded-lg overflow-hidden;
+    @apply my-6 rounded-xl overflow-hidden border border-white/10;
   }
 
   .prose pre code {
-    @apply bg-transparent p-0 text-sm;
+    @apply bg-transparent p-0 text-sm text-zinc-300;
   }
 
   .prose img {
-    @apply max-w-full h-auto rounded-lg my-4;
+    @apply max-w-full h-auto rounded-xl my-8 border border-white/10;
   }
 
   .prose a {
-    @apply text-primary-600 hover:text-primary-700 underline;
+    @apply text-primary hover:text-secondary underline decoration-primary/30 hover:decoration-secondary transition-colors;
   }
 
   .prose table {
-    @apply w-full border-collapse my-4;
+    @apply w-full border-collapse my-6 text-sm;
   }
 
   .prose th,
   .prose td {
-    @apply border border-gray-200 px-4 py-2 text-left;
+    @apply border border-white/10 px-4 py-3 text-left;
   }
 
   .prose th {
-    @apply bg-gray-50 font-semibold;
+    @apply bg-surface font-mono font-medium text-zinc-300 uppercase tracking-wider text-xs;
   }
 }
 
-/* 代码高亮主题 */
+@layer components {
+  /* Glow effects */
+  .glow {
+    box-shadow: 0 0 40px -10px var(--tw-shadow-color);
+  }
+  
+  .glass {
+    @apply bg-surface/40 backdrop-blur-md border border-white/5;
+  }
+
+  /* Text reveal animation */
+  .reveal-text {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+  }
+  .reveal-text span {
+    display: inline-block;
+    transform: translateY(100%);
+    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .reveal-text.active span {
+    transform: translateY(0);
+  }
+  
+  /* Background blob */
+  .bg-blob {
+    position: absolute;
+    filter: blur(100px);
+    z-index: -1;
+    opacity: 0.5;
+  }
+}
+
+/* 代码高亮主题 (Dark) */
 @layer utilities {
-  .hljs {
-    @apply bg-gray-900 text-gray-100 p-4 overflow-x-auto;
-  }
-
-  .hljs-comment,
-  .hljs-quote {
-    @apply text-gray-500;
-  }
-
-  .hljs-variable,
-  .hljs-template-variable,
-  .hljs-attr,
-  .hljs-tag,
-  .hljs-name,
-  .hljs-regexp,
-  .hljs-link,
-  .hljs-selector-id,
-  .hljs-selector-class {
-    @apply text-orange-400;
-  }
-
-  .hljs-number,
-  .hljs-meta,
-  .hljs-built_in,
-  .hljs-builtin-name,
-  .hljs-literal,
-  .hljs-type,
-  .hljs-params {
-    @apply text-cyan-400;
-  }
-
-  .hljs-string,
-  .hljs-symbol,
-  .hljs-bullet {
-    @apply text-green-400;
-  }
-
-  .hljs-title,
-  .hljs-section {
-    @apply text-yellow-400;
-  }
-
-  .hljs-keyword,
-  .hljs-selector-tag {
-    @apply text-purple-400;
-  }
+  .hljs { @apply bg-black text-zinc-300 p-6 overflow-x-auto; }
+  .hljs-comment, .hljs-quote { @apply text-zinc-500 italic; }
+  .hljs-variable, .hljs-template-variable, .hljs-attr, .hljs-tag, .hljs-name, .hljs-regexp, .hljs-link, .hljs-selector-id, .hljs-selector-class { @apply text-secondary; }
+  .hljs-number, .hljs-meta, .hljs-built_in, .hljs-builtin-name, .hljs-literal, .hljs-type, .hljs-params { @apply text-primary; }
+  .hljs-string, .hljs-symbol, .hljs-bullet { @apply text-emerald-400; }
+  .hljs-title, .hljs-section { @apply text-amber-300 font-bold; }
+  .hljs-keyword, .hljs-selector-tag { @apply text-pink-500; }
 }
 
-/* 自定义滚动条 */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #09090b; }
+::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+
+/* Custom Cursor styles */
+#cursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 20px; height: 20px;
+  border: 1px solid #8b5cf6;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, background-color 0.3s, mix-blend-mode 0.3s;
 }
 
-::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+#cursor-dot {
+  position: fixed;
+  top: 0; left: 0;
+  width: 4px; height: 4px;
+  background: #06b6d4;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
 }
 
-::-webkit-scrollbar-thumb {
-  @apply bg-primary-500 rounded;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-primary-600;
+.cursor-hover {
+  width: 60px !important;
+  height: 60px !important;
+  background-color: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.5);
+  mix-blend-mode: screen;
 }
