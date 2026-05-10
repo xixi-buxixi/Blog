@@ -12,9 +12,17 @@
     overflow-x: hidden;
   }
 
+  html.dark body {
+    @apply bg-slate-950 text-slate-200;
+  }
+
   /* 文章内容样式 */
   .prose {
     @apply text-slate-700 leading-relaxed font-serif text-lg;
+  }
+
+  html.dark .prose {
+    @apply text-slate-300;
   }
 
   .prose h1,
@@ -22,6 +30,13 @@
   .prose h3,
   .prose h4 {
     @apply text-slate-900 font-sans font-bold mt-10 mb-4 tracking-tight;
+  }
+
+  html.dark .prose h1,
+  html.dark .prose h2,
+  html.dark .prose h3,
+  html.dark .prose h4 {
+    @apply text-slate-100;
   }
 
   .prose h1 { @apply text-4xl; }
@@ -45,12 +60,24 @@
     @apply border-l-4 border-slate-300 pl-6 py-2 my-8 text-slate-500 italic;
   }
 
+  html.dark .prose blockquote {
+    @apply border-slate-600 text-slate-400;
+  }
+
   .prose code {
     @apply bg-slate-100 px-1.5 py-0.5 rounded text-sm font-mono text-slate-800;
   }
 
+  html.dark .prose code {
+    @apply bg-slate-800 text-slate-200;
+  }
+
   .prose pre {
     @apply my-8 rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-[#0f172a];
+  }
+
+  html.dark .prose pre {
+    @apply border-slate-700;
   }
 
   .prose pre code {
@@ -65,6 +92,10 @@
     @apply text-blue-600 hover:text-blue-800 underline decoration-blue-200 hover:decoration-blue-600 transition-colors;
   }
 
+  html.dark .prose a {
+    @apply text-blue-400 hover:text-blue-300 decoration-blue-800 hover:decoration-blue-500;
+  }
+
   .prose table {
     @apply w-full border-collapse my-8 text-sm font-sans;
   }
@@ -74,8 +105,17 @@
     @apply border border-slate-200 px-4 py-3 text-left;
   }
 
+  html.dark .prose th,
+  html.dark .prose td {
+    @apply border-slate-700;
+  }
+
   .prose th {
     @apply bg-slate-50 font-semibold text-slate-800;
+  }
+
+  html.dark .prose th {
+    @apply bg-slate-800 text-slate-200;
   }
 }
 
@@ -83,6 +123,10 @@
   /* Subtle glass effect for light theme */
   .glass {
     @apply bg-white/80 backdrop-blur-md border border-slate-200 shadow-sm;
+  }
+
+  html.dark .glass {
+    @apply bg-slate-900/80 border-slate-700;
   }
 }
 
@@ -102,3 +146,7 @@
 ::-webkit-scrollbar-track { background: #f8fafc; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+html.dark ::-webkit-scrollbar-track { background: #1e293b; }
+html.dark ::-webkit-scrollbar-thumb { background: #475569; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }

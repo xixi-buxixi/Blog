@@ -39,10 +39,11 @@ const author = {
   name: 'lililiz',
   bio: '全栈工程师 & AI应用工程师',
   avatar: '/images/image.png',
-  intro: '一个热爱技术与创造的开发者，专注于 Java 后端、AI 应用与智能 Agent 系统方向。正在探索如何让 AI 不只是“回答问题”，而是真正具备长期记忆、自主行为与成长能力。
-擅长 Spring Boot、Spring Cloud、Redis、MySQL 等后端技术栈，同时也在深入研究大模型、向量数据库、Agent 架构、Prompt Engineering 与 AI 系统设计。热衷于将复杂技术拆解为通俗易懂的内容，对底层原理、系统架构与工程实践保持持续探索。
-目前正在构建多个 AI 与 Agent 相关项目，包括具备自主发帖、评论、成长机制的 AI 社区，以及融合天气监测、风险预警与智能助手的环境预警系统。喜欢把“想法”真正落地成可运行的产品。相信技术不仅是代码，更是一种创造未来的能力。热爱学习，持续折腾，长期主义者。
-'
+  paragraphs: [
+    '一个热爱技术与创造的开发者，专注于 Java 后端、AI 应用与智能 Agent 系统方向。正在探索如何让 AI 不只是"回答问题"，而是真正具备长期记忆、自主行为与成长能力。',
+    '擅长 Spring Boot、Spring Cloud、Redis、MySQL 等后端技术栈，同时也在深入研究大模型、向量数据库、Agent 架构、Prompt Engineering 与 AI 系统设计。热衷于将复杂技术拆解为通俗易懂的内容，对底层原理、系统架构与工程实践保持持续探索。',
+    '目前正在构建多个 AI 与 Agent 相关项目，包括具备自主发帖、评论、成长机制的 AI 社区，以及融合天气监测、风险预警与智能助手的环境预警系统。喜欢把"想法"真正落地成可运行的产品。相信技术不仅是代码，更是一种创造未来的能力。热爱学习，持续折腾，长期主义者。',
+  ],
 };
 ---
 
@@ -54,26 +55,30 @@ const author = {
     <!-- Profile Section -->
     <section class="mb-20 max-w-3xl">
       <div class="flex items-center gap-6 mb-6">
-        <img src={author.avatar} alt={author.name} class="w-20 h-20 rounded-full border border-slate-200 shadow-sm" />
+        <img src={author.avatar} alt={author.name} class="w-20 h-20 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm" />
         <div>
-          <h1 class="text-3xl font-sans font-bold text-slate-900">{author.name}</h1>
-          <p class="text-slate-500 font-sans text-lg">{author.bio}</p>
+          <h1 class="text-3xl font-sans font-bold text-slate-900 dark:text-white">{author.name}</h1>
+          <p class="text-slate-500 dark:text-slate-400 font-sans text-lg">{author.bio}</p>
         </div>
       </div>
-      <p class="text-slate-700 leading-relaxed font-serif text-lg">
-        {author.intro}
-      </p>
+      <div class="space-y-4">
+        {author.paragraphs.map(p => (
+          <p class="text-slate-700 dark:text-slate-300 leading-relaxed font-serif text-lg">
+            {p}
+          </p>
+        ))}
+      </div>
     </section>
 
     <div class="flex flex-col lg:flex-row gap-16">
       
       <!-- Articles List (Main Content) -->
       <div class="flex-1">
-        <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-8">
-          <h2 class="font-sans text-2xl font-bold text-slate-900">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-8">
+          <h2 class="font-sans text-2xl font-bold text-slate-900 dark:text-white">
             {selectedCategory ? `Category: ${selectedCategory.name}` : 'Latest Articles'}
           </h2>
-          <span class="text-slate-500 font-sans text-sm">{total} Posts</span>
+          <span class="text-slate-500 dark:text-slate-400 font-sans text-sm">{total} Posts</span>
         </div>
 
         {articles?.length > 0 ? (
@@ -83,14 +88,14 @@ const author = {
             ))}
           </div>
         ) : (
-          <div class="text-center py-20 bg-slate-50 rounded-xl border border-slate-100">
-            <p class="font-sans text-slate-500 text-lg">No articles found.</p>
+          <div class="text-center py-20 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+            <p class="font-sans text-slate-500 dark:text-slate-400 text-lg">No articles found.</p>
           </div>
         )}
 
         <!-- Pagination -->
         {totalPages > 1 && (
-          <div class="mt-16 border-t border-slate-200 pt-8">
+          <div class="mt-16 border-t border-slate-200 dark:border-slate-800 pt-8">
             <Pagination
               currentPage={page}
               totalPages={totalPages}
@@ -103,19 +108,19 @@ const author = {
       <!-- Right Sidebar (Categories) -->
       <aside class="w-full lg:w-72">
         <div class="sticky top-32">
-          <h3 class="font-sans font-bold text-slate-900 mb-6 uppercase tracking-wide flex items-center gap-2">
-            <span class="w-2 h-2 bg-slate-900 rounded-full"></span>
+          <h3 class="font-sans font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-wide flex items-center gap-2">
+            <span class="w-2 h-2 bg-slate-900 dark:bg-white rounded-full"></span>
             Categories
           </h3>
           <ul class="flex flex-col gap-2 font-sans">
             <li>
-              <a href="/" class={`transition-all inline-block flex w-full items-center justify-between border-b border-slate-100 pb-3 ${!categoryId ? 'text-blue-600 font-medium' : 'text-slate-600 hover:text-slate-900 hover:translate-x-1'}`}>
+              <a href="/" class={`transition-all inline-block flex w-full items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 ${!categoryId ? 'text-blue-600 dark:text-blue-400 font-medium' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:translate-x-1'}`}>
                 <span>All Articles</span>
               </a>
             </li>
             {categories.map(cat => (
               <li>
-                <a href={`/?category=${cat.id}`} class={`transition-all inline-block flex w-full items-center justify-between border-b border-slate-100 pb-3 ${categoryId === cat.id ? 'text-blue-600 font-medium' : 'text-slate-600 hover:text-slate-900 hover:translate-x-1'}`}>
+                <a href={`/?category=${cat.id}`} class={`transition-all inline-block flex w-full items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 ${categoryId === cat.id ? 'text-blue-600 dark:text-blue-400 font-medium' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:translate-x-1'}`}>
                   <span>{cat.name}</span>
                 </a>
               </li>
