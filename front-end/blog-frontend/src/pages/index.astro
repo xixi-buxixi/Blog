@@ -3,9 +3,8 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import ArticleCard from '../components/ArticleCard.astro';
-import Pagination from '../components/Pagination.astro';
-import { articleApi, categoryApi, type Article, type Category } from '../utils/api';
+import ArticleList from '../components/ArticleList';
+import { categoryApi, type Category } from '../utils/api';
 
 // 获取查询参数
 const url = new URL(Astro.request.url);
@@ -13,23 +12,13 @@ const page = parseInt(url.searchParams.get('page') || '1');
 const categoryId = url.searchParams.get('category') ? parseInt(url.searchParams.get('category')!) : undefined;
 const pageSize = 10;
 
-// 获取文章列表和分类列表
-let articles: Article[] = [];
+// 只获取分类列表（文章通过客户端加载）
 let categories: Category[] = [];
-let total = 0;
-let totalPages = 1;
-
 try {
-  const [articlesRes, categoriesRes] = await Promise.all([
-    articleApi.getList({ page, pageSize, categoryId }),
-    categoryApi.getList()
-  ]);
-  articles = articlesRes.data.records || [];
-  total = articlesRes.data.total || 0;
-  totalPages = articlesRes.data.pages || 1;
+  const categoriesRes = await categoryApi.getList();
   categories = categoriesRes.data || [];
 } catch (error) {
-  console.error('Failed to fetch data:', error);
+  console.error('Failed to fetch categories:', error);
 }
 
 const selectedCategory = categoryId ? categories.find(c => c.id === categoryId) : null;
@@ -45,6 +34,26 @@ const author = {
     '目前正在构建多个 AI 与 Agent 相关项目，包括具备自主发帖、评论、成长机制的 AI 社区，以及融合天气监测、风险预警与智能助手的环境预警系统。喜欢把"想法"真正落地成可运行的产品。相信技术不仅是代码，更是一种创造未来的能力。热爱学习，持续折腾，长期主义者。',
   ],
 };
+
+// Projects
+const projects = [
+  {
+    name: 'Pulse',
+    url: 'https://www.lililiz.top/pulse',
+    description: '具备自主发帖、评论、成长机制的 AI 社区。AI Agent 可以像真人一样参与社区讨论、发表观点，并随着时间推移不断"成长"与"进化"。',
+    tech: 'Spring Boot / AI Agent / LLM',
+    icon: 'pulse',
+    color: 'from-violet-500 to-purple-600',
+  },
+  {
+    name: 'Environment',
+    url: 'https://www.lililiz.top/environment',
+    description: '融合天气监测、风险预警与智能助手的环境预警系统。实时采集环境数据，结合 AI 分析实现智能预警与决策辅助。',
+    tech: 'Spring Boot / IoT / AI 预警',
+    icon: 'globe',
+    color: 'from-emerald-500 to-teal-600',
+  },
+];
 ---
 
 <Layout title={selectedCategory ? `${selectedCategory.name} - TECH::minimal` : 'TECH::minimal | Blog'}>
@@ -53,7 +62,7 @@ const author = {
   <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 sm:pb-20">
     
     <!-- Profile Section -->
-    <section class="mb-16 sm:mb-20 max-w-3xl">
+    <section class="mb-12 max-w-3xl">
       <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mb-6">
         <img src={author.avatar} alt={author.name} class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm" />
         <div>
@@ -70,39 +79,42 @@ const author = {
       </div>
     </section>
 
+    <!-- Projects Section -->
+    <section class="mb-16 max-w-3xl">
+      <h2 class="font-sans text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+        <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+        Featured Projects
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {projects.map(project => (
+          <a
+            href={project.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group block p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+          >
+            <div class="flex items-center gap-3 mb-3">
+              <div class={`w-10 h-10 rounded-lg bg-gradient-to-br ${project.color} flex items-center justify-center text-white text-lg font-bold shrink-0`}>
+                {project.name.charAt(0)}
+              </div>
+              <div>
+                <h3 class="font-sans font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  {project.name}
+                </h3>
+                <p class="text-xs text-slate-400 dark:text-slate-500 font-mono">{project.tech}</p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-serif">{project.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
     <div class="flex flex-col lg:flex-row gap-16">
       
-      <!-- Articles List (Main Content) -->
+      <!-- Articles List (Main Content) - Client-side with loading -->
       <div class="flex-1">
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-8">
-          <h2 class="font-sans text-2xl font-bold text-slate-900 dark:text-white">
-            {selectedCategory ? `Category: ${selectedCategory.name}` : 'Latest Articles'}
-          </h2>
-          <span class="text-slate-500 dark:text-slate-400 font-sans text-sm">{total} Posts</span>
-        </div>
-
-        {articles?.length > 0 ? (
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {articles.map((article, index) => (
-              <ArticleCard article={article} index={index} />
-            ))}
-          </div>
-        ) : (
-          <div class="text-center py-20 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
-            <p class="font-sans text-slate-500 dark:text-slate-400 text-lg">No articles found.</p>
-          </div>
-        )}
-
-        <!-- Pagination -->
-        {totalPages > 1 && (
-          <div class="mt-16 border-t border-slate-200 dark:border-slate-800 pt-8">
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              baseUrl={categoryId ? `/?category=${categoryId}` : '/'}
-            />
-          </div>
-        )}
+        <ArticleList client:load page={page} pageSize={pageSize} categoryId={categoryId} />
       </div>
 
       <!-- Right Sidebar (Categories) -->
