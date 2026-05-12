@@ -3,8 +3,9 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import ArticleList from '../components/ArticleList';
-import { categoryApi, type Category } from '../utils/api';
+import ArticleCard from '../components/ArticleCard.astro';
+import Pagination from '../components/Pagination.astro';
+import { articleApi, categoryApi, type Article, type Category } from '../utils/api';
 
 // 获取查询参数
 const url = new URL(Astro.request.url);
@@ -12,13 +13,23 @@ const page = parseInt(url.searchParams.get('page') || '1');
 const categoryId = url.searchParams.get('category') ? parseInt(url.searchParams.get('category')!) : undefined;
 const pageSize = 10;
 
-// 只获取分类列表（文章通过客户端加载）
+// 获取文章列表和分类列表
+let articles: Article[] = [];
 let categories: Category[] = [];
+let total = 0;
+let totalPages = 1;
+
 try {
-  const categoriesRes = await categoryApi.getList();
+  const [articlesRes, categoriesRes] = await Promise.all([
+    articleApi.getList({ current: page, size: pageSize, categoryId }),
+    categoryApi.getList()
+  ]);
+  articles = articlesRes.data.records || [];
+  total = articlesRes.data.total || 0;
+  totalPages = articlesRes.data.pages || 1;
   categories = categoriesRes.data || [];
 } catch (error) {
-  console.error('Failed to fetch categories:', error);
+  console.error('Failed to fetch data:', error);
 }
 
 const selectedCategory = categoryId ? categories.find(c => c.id === categoryId) : null;
@@ -110,9 +121,37 @@ const author = {
 
     <div class="flex flex-col lg:flex-row gap-16">
       
-      <!-- Articles List (Main Content) - Client-side with loading -->
+      <!-- Articles List (Main Content) -->
       <div class="flex-1">
-        <ArticleList client:load page={page} pageSize={pageSize} categoryId={categoryId} />
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-8">
+          <h2 class="font-sans text-2xl font-bold text-slate-900 dark:text-white">
+            {selectedCategory ? `Category: ${selectedCategory.name}` : 'Latest Articles'}
+          </h2>
+          <span class="text-slate-500 dark:text-slate-400 font-sans text-sm">{total} Posts</span>
+        </div>
+
+        {articles?.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {articles.map((article, index) => (
+              <ArticleCard article={article} index={index} />
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-20 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+            <p class="font-sans text-slate-500 dark:text-slate-400 text-lg">No articles found.</p>
+          </div>
+        )}
+
+        <!-- Pagination -->
+        {totalPages > 1 && (
+          <div class="mt-16 border-t border-slate-200 dark:border-slate-800 pt-8">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              baseUrl={categoryId ? `/?category=${categoryId}` : '/'}
+            />
+          </div>
+        )}
       </div>
 
       <!-- Right Sidebar (Categories) -->
