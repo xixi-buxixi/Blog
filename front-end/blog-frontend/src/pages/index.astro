@@ -13,16 +13,31 @@ const page = parseInt(url.searchParams.get('page') || '1');
 const categoryId = url.searchParams.get('category') ? parseInt(url.searchParams.get('category')!) : undefined;
 const pageSize = 10;
 
-// 获取文章列表和分类列表
+// 获取文章列表和分类列表（带重试，解决首次加载后端未就绪问题）
 let articles: Article[] = [];
 let categories: Category[] = [];
 let total = 0;
 let totalPages = 1;
 
+async function fetchWithRetry<T>(fn: () => Promise<T>, retries = 2, delay = 500): Promise<T> {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (i < retries) {
+        await new Promise(r => setTimeout(r, delay * (i + 1)));
+      } else {
+        throw e;
+      }
+    }
+  }
+  throw new Error('unreachable');
+}
+
 try {
   const [articlesRes, categoriesRes] = await Promise.all([
-    articleApi.getList({ current: page, size: pageSize, categoryId }),
-    categoryApi.getList()
+    fetchWithRetry(() => articleApi.getList({ current: page, size: pageSize, categoryId })),
+    fetchWithRetry(() => categoryApi.getList())
   ]);
   articles = articlesRes.data.records || [];
   total = articlesRes.data.total || 0;

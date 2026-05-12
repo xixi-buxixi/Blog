@@ -15,8 +15,18 @@ let article: Article | null = null;
 let error: string | null = null;
 
 if (articleId) {
+  const fetchWithRetry = async <T,>(fn: () => Promise<T>, retries = 2, delay = 500): Promise<T> => {
+    for (let i = 0; i <= retries; i++) {
+      try { return await fn(); } catch (e) {
+        if (i < retries) await new Promise(r => setTimeout(r, delay * (i + 1)));
+        else throw e;
+      }
+    }
+    throw new Error('unreachable');
+  };
+
   try {
-    const res = await articleApi.getDetail(articleId);
+    const res = await fetchWithRetry(() => articleApi.getDetail(articleId));
     article = res.data;
   } catch (e) {
     error = '文章不存在或已被删除';
