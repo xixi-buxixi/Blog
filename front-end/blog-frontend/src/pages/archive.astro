@@ -17,7 +17,7 @@ interface ArchiveGroup {
 let archiveData: ArchiveGroup[] = [];
 
 try {
-  const res = await articleApi.getList({ page: 1, pageSize: 100 });
+  const res = await articleApi.getList({ current: 1, size: 100 });
   const articles = res.data.records;
 
   const groupedByYear = articles.reduce((acc, article) => {

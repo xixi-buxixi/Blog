@@ -90,14 +90,14 @@ async function request<T>(
 export const articleApi = {
   // 获取文章列表
   getList: (params: {
-    page?: number;
-    pageSize?: number;
+    current?: number;
+    size?: number;
     categoryId?: number;
     keyword?: string;
   } = {}) => {
     const searchParams = new URLSearchParams();
-    if (params.page) searchParams.set('page', String(params.page));
-    if (params.pageSize) searchParams.set('pageSize', String(params.pageSize));
+    if (params.current) searchParams.set('current', String(params.current));
+    if (params.size) searchParams.set('size', String(params.size));
     if (params.categoryId) searchParams.set('categoryId', String(params.categoryId));
     if (params.keyword) searchParams.set('keyword', params.keyword);
 
@@ -111,8 +111,8 @@ export const articleApi = {
   },
 
   // 搜索文章
-  search: (keyword: string, page: number = 1, pageSize: number = 10) => {
-    return request<PageResponse<Article>>(`/articles?keyword=${encodeURIComponent(keyword)}&page=${page}&pageSize=${pageSize}`);
+  search: (keyword: string, current: number = 1, size: number = 10) => {
+    return request<PageResponse<Article>>(`/articles?keyword=${encodeURIComponent(keyword)}&current=${current}&size=${size}`);
   },
 };
 

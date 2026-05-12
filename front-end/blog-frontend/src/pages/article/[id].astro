@@ -32,6 +32,12 @@ const formatDate = (dateStr: string) => {
     day: 'numeric'
   }).toUpperCase();
 };
+
+// 修正图片地址（去除 localhost/127.0.0.1 前缀，改用相对路径）
+const fixImageUrl = (url: string | null) => {
+  if (!url) return url;
+  return url.replace(/^https?:\/\/(?:localhost|127\.0\.0\.1):\d+/, '');
+};
 ---
 
 <Layout title={article ? `${article.title} | SYS.LOG` : 'Article Not Found | SYS.LOG'} description={article?.summary}>
@@ -80,7 +86,7 @@ const formatDate = (dateStr: string) => {
         {article.coverImage && (
           <div class="mb-12 rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-primary/5">
             <img
-              src={article.coverImage}
+              src={fixImageUrl(article.coverImage)}
               alt={article.title}
               class="w-full h-auto object-cover max-h-[60vh]"
             />
@@ -191,6 +197,13 @@ const formatDate = (dateStr: string) => {
           const html = marked.parse(rawContent);
           const cleanHtml = DOMPurify.sanitize(html);
           contentEl.innerHTML = cleanHtml;
+          // 修正图片链接：将 localhost:8080 替换为相对路径
+          contentEl.querySelectorAll('img').forEach(img => {
+            const src = img.getAttribute('src') || '';
+            img.src = src.replace(/^https?:\/\/localhost:8080/, '');
+            // 也兼容可能的 127.0.0.1:8080
+            img.src = img.src.replace(/^https?:\/\/127\.0\.0\.1:8080/, '');
+          });
         }
       } catch (e) {
         const contentEl = document.getElementById('article-content');

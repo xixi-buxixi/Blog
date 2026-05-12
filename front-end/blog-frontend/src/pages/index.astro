@@ -35,25 +35,6 @@ const author = {
   ],
 };
 
-// Projects
-const projects = [
-  {
-    name: 'Pulse',
-    url: 'https://www.lililiz.top/pulse',
-    description: '具备自主发帖、评论、成长机制的 AI 社区。AI Agent 可以像真人一样参与社区讨论、发表观点，并随着时间推移不断"成长"与"进化"。',
-    tech: 'Spring Boot / AI Agent / LLM',
-    icon: 'pulse',
-    color: 'from-violet-500 to-purple-600',
-  },
-  {
-    name: 'Environment',
-    url: 'https://www.lililiz.top/environment',
-    description: '融合天气监测、风险预警与智能助手的环境预警系统。实时采集环境数据，结合 AI 分析实现智能预警与决策辅助。',
-    tech: 'Spring Boot / IoT / AI 预警',
-    icon: 'globe',
-    color: 'from-emerald-500 to-teal-600',
-  },
-];
 ---
 
 <Layout title={selectedCategory ? `${selectedCategory.name} - TECH::minimal` : 'TECH::minimal | Blog'}>
@@ -86,27 +67,44 @@ const projects = [
         Featured Projects
       </h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {projects.map(project => (
-          <a
-            href={project.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group block p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
-          >
-            <div class="flex items-center gap-3 mb-3">
-              <div class={`w-10 h-10 rounded-lg bg-gradient-to-br ${project.color} flex items-center justify-center text-white text-lg font-bold shrink-0`}>
-                {project.name.charAt(0)}
-              </div>
-              <div>
-                <h3 class="font-sans font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                  {project.name}
-                </h3>
-                <p class="text-xs text-slate-400 dark:text-slate-500 font-mono">{project.tech}</p>
-              </div>
+        <a
+          href="https://www.lililiz.top/pulse"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group block p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+        >
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold shrink-0">
+              P
             </div>
-            <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-serif">{project.description}</p>
-          </a>
-        ))}
+            <div>
+              <h3 class="font-sans font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                Pulse
+              </h3>
+              <p class="text-xs text-slate-400 dark:text-slate-500 font-mono">Spring Boot / AI Agent / LLM</p>
+            </div>
+          </div>
+          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-serif">具备自主发帖、评论、成长机制的 AI 社区。AI Agent 可以像真人一样参与社区讨论、发表观点，并随着时间推移不断"成长"与"进化"。</p>
+        </a>
+        <a
+          href="https://www.lililiz.top/environment"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group block p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+        >
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-lg font-bold shrink-0">
+              E
+            </div>
+            <div>
+              <h3 class="font-sans font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                Environment
+              </h3>
+              <p class="text-xs text-slate-400 dark:text-slate-500 font-mono">Spring Boot / IoT / AI 预警</p>
+            </div>
+          </div>
+          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-serif">融合天气监测、风险预警与智能助手的环境预警系统。实时采集环境数据，结合 AI 分析实现智能预警与决策辅助。</p>
+        </a>
       </div>
     </section>
 
