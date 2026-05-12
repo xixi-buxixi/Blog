@@ -1,9 +1,9 @@
 // API 基础配置
-// SSR 模式下服务端需要直接请求后端，浏览器端通过 Nginx 代理
-const API_BASE_URL = import.meta.env.API_BASE_URL || (
+// SSR 模式下服务端通过 Nginx 80 端口代理到后端 8081，浏览器端通过 Nginx 443 代理
+const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || (
   typeof window === 'undefined'
-    ? 'http://127.0.0.1:8080/api/v1'  // SSR 服务端直接请求后端
-    : '/api/v1'  // 浏览器端通过 Nginx 代理转发
+    ? 'http://127.0.0.1/api/v1'  // SSR 服务端 → Nginx 80 → 后端 8081
+    : '/api/v1'  // 浏览器端 → Nginx 443 → 后端 8081
 );
 
 // 统一响应结构
