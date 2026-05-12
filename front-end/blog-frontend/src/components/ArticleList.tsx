@@ -47,7 +47,7 @@ export default function ArticleList({ page, pageSize, categoryId }: Props) {
     setLoading(true);
     setError(null);
 
-    articleApi.getList({ page, pageSize, categoryId })
+    articleApi.getList({ current: page, size: pageSize, categoryId })
       .then(res => {
         if (!cancelled) {
           setArticles(res.data.records || []);
