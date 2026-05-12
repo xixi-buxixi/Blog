@@ -58,10 +58,7 @@ jobs:
           host: ${{ secrets.TENCENT_HOST }}
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: |
-            front-end/blog-frontend/dist
-            front-end/blog-frontend/package.json
-            front-end/blog-frontend/package-lock.json
+          source: "front-end/blog-frontend/dist,front-end/blog-frontend/package.json,front-end/blog-frontend/package-lock.json"
           target: /var/www/blog/frontend/
           strip_components: 2
       - name: Install deps + Restart
