@@ -39,7 +39,7 @@ request.interceptors.response.use(
         case 401:
           message.error('登录已过期，请重新登录')
           removeToken()
-          window.location.href = '/login'
+          window.location.href = `${import.meta.env.BASE_URL || '/'}login`
           break
         case 403:
           message.error('没有权限访问')

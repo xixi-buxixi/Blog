@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * MyBatis-Plus配置类
@@ -19,6 +20,8 @@ import java.time.LocalDateTime;
 @Configuration
 @EnableScheduling
 public class MyBatisConfig {
+
+    private static final ZoneId APP_ZONE = ZoneId.of("Asia/Shanghai");
 
     /**
      * 分页插件
@@ -38,14 +41,15 @@ public class MyBatisConfig {
         return new MetaObjectHandler() {
             @Override
             public void insertFill(MetaObject metaObject) {
-                this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, LocalDateTime.now());
-                this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
-                this.strictInsertFill(metaObject, "viewTime", LocalDateTime.class, LocalDateTime.now());
+                LocalDateTime now = LocalDateTime.now(APP_ZONE);
+                this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, now);
+                this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, now);
+                this.strictInsertFill(metaObject, "viewTime", LocalDateTime.class, now);
             }
 
             @Override
             public void updateFill(MetaObject metaObject) {
-                this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+                this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now(APP_ZONE));
             }
         };
     }

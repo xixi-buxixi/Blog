@@ -18,10 +18,10 @@ try {
 }
 ---
 
-<section class="mt-16 pt-16 border-t border-white/10" id="comment-section" data-article-id={articleId}>
+<section class="mt-16 pt-16 border-t border-slate-200 dark:border-white/10" id="comment-section" data-article-id={articleId}>
   <!-- 评论区标题 -->
   <div class="mb-10">
-    <h2 class="font-display text-2xl md:text-3xl font-bold flex items-center text-white">
+    <h2 class="font-display text-2xl md:text-3xl font-bold flex items-center text-slate-900 dark:text-white">
       <svg class="w-6 h-6 mr-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
       </svg>
@@ -31,14 +31,14 @@ try {
   </div>
 
   <!-- 发表评论框 -->
-  <div class="mb-12 p-6 glass rounded-2xl border border-white/5" id="comment-form-container">
+  <div class="mb-12 p-6 glass rounded-2xl border border-slate-200 dark:border-white/5" id="comment-form-container">
     <!-- 游客信息输入框 -->
     <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-sm">
       <div>
         <input
           type="text"
           id="guest-nickname"
-          class="w-full px-4 py-3 bg-surface/50 border border-white/10 rounded-xl focus:outline-none focus:border-primary focus:bg-surface/80 text-white placeholder:text-zinc-600 transition-colors hover-trigger"
+          class="w-full px-4 py-3 bg-white/80 dark:bg-surface/50 border border-slate-300 dark:border-white/10 rounded-xl focus:outline-none focus:border-primary dark:focus:border-primary focus:bg-white dark:focus:bg-surface/80 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-600 transition-colors hover-trigger"
           placeholder="USER_ALIAS (REQUIRED)"
           maxlength="50"
         />
@@ -47,7 +47,7 @@ try {
         <input
           type="email"
           id="guest-email"
-          class="w-full px-4 py-3 bg-surface/50 border border-white/10 rounded-xl focus:outline-none focus:border-primary focus:bg-surface/80 text-white placeholder:text-zinc-600 transition-colors hover-trigger"
+          class="w-full px-4 py-3 bg-white/80 dark:bg-surface/50 border border-slate-300 dark:border-white/10 rounded-xl focus:outline-none focus:border-primary dark:focus:border-primary focus:bg-white dark:focus:bg-surface/80 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-600 transition-colors hover-trigger"
           placeholder="SECURE_EMAIL (REQUIRED)"
           maxlength="100"
         />
@@ -57,7 +57,7 @@ try {
     <div class="mb-4 font-mono text-sm">
       <textarea
         id="comment-content"
-        class="w-full px-4 py-4 bg-surface/50 border border-white/10 rounded-xl focus:outline-none focus:border-primary focus:bg-surface/80 text-white placeholder:text-zinc-600 resize-none transition-colors hover-trigger"
+        class="w-full px-4 py-4 bg-white/80 dark:bg-surface/50 border border-slate-300 dark:border-white/10 rounded-xl focus:outline-none focus:border-primary dark:focus:border-primary focus:bg-white dark:focus:bg-surface/80 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-600 resize-none transition-colors hover-trigger"
         placeholder="INITIALIZE TRANSMISSION..."
         rows="4"
         maxlength="500"
@@ -70,7 +70,7 @@ try {
     <div class="flex justify-end">
       <button
         id="submit-comment-btn"
-        class="px-6 py-3 bg-white/10 text-white font-mono text-sm rounded-xl hover:bg-primary hover:text-black transition-colors hover-trigger font-bold tracking-wider"
+        class="px-6 py-3 bg-slate-900 text-white dark:bg-white/10 dark:text-white font-mono text-sm rounded-xl hover:bg-primary hover:text-white dark:hover:text-black disabled:cursor-not-allowed disabled:opacity-60 transition-colors hover-trigger font-bold tracking-wider"
       >
         TRANSMIT
       </button>
@@ -86,7 +86,7 @@ try {
   <div id="load-more-container" class="hidden mt-10 text-center">
     <button
       id="load-more-btn"
-      class="px-6 py-2 bg-white/5 border border-white/10 text-zinc-400 font-mono text-sm rounded-xl hover:bg-white/10 hover:text-white transition-colors hover-trigger"
+      class="px-6 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-zinc-400 font-mono text-sm rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-colors hover-trigger"
     >
       LOAD ADDITIONAL THREADS
     </button>
@@ -102,18 +102,61 @@ try {
 </section>
 
 <script define:vars={{ commentCount }}>
-  import { commentApi } from '../utils/api';
+  // Inline comment API — avoids ES module import issue in inline scripts
+  const API_BASE = '/api/v1';
+  const commentApi = {
+    async getComments(articleId, page = 1, size = 20) {
+      const res = await fetch(`${API_BASE}/comments/article/${articleId}?page=${page}&size=${size}`);
+      if (!res.ok) throw new Error('Failed to fetch comments');
+      const data = await res.json();
+      if (data.code !== 200) throw new Error(data.message || 'Failed to fetch comments');
+      return data;
+    },
+    async createComment(data) {
+      const res = await fetch(`${API_BASE}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Failed to create comment');
+      const result = await res.json();
+      if (result.code !== 200) throw new Error(result.message || 'Failed to create comment');
+      return result;
+    },
+  };
 
   // 状态管理
   let currentPage = 1;
   let totalComments = 0;
   let hasMore = false;
+  let isSubmittingComment = false;
+  const pendingReplySubmissions = new Set();
+
+  function setElementSubmitting(element, isSubmitting, submittingText = 'TRANSMITTING', idleText = 'TRANSMIT') {
+    if (!element) return;
+    element.disabled = isSubmitting;
+    element.setAttribute('aria-busy', isSubmitting ? 'true' : 'false');
+    element.textContent = isSubmitting ? submittingText : idleText;
+  }
+
+  function parseServerTime(dateStr) {
+    if (!dateStr) return new Date(NaN);
+    const raw = String(dateStr).trim();
+    if (/([zZ]|[+-]\d{2}:?\d{2})$/.test(raw)) {
+      return new Date(raw);
+    }
+    const isoLike = raw.includes('T') ? raw : raw.replace(' ', 'T');
+    return new Date(`${isoLike}+08:00`);
+  }
 
   // 工具函数：相对时间格式化
   function formatRelativeTime(dateStr) {
-    const date = new Date(dateStr);
+    const date = parseServerTime(dateStr);
+    if (Number.isNaN(date.getTime())) {
+      return 'JUST NOW';
+    }
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
+    const diff = Math.max(0, now.getTime() - date.getTime());
 
     const seconds = Math.floor(diff / 1000);
     const minutes = Math.floor(seconds / 60);
@@ -162,7 +205,7 @@ try {
     const showReplyButton = !isReply; // 二级回复不能再回复
 
     return `
-      <div class="comment-card ${isReply ? 'ml-6 sm:ml-10 pl-6 sm:pl-8 border-l-2 border-white/10' : 'glass border border-white/5 rounded-2xl p-6'}" data-comment-id="${comment.id}">
+      <div class="comment-card ${isReply ? 'ml-6 sm:ml-10 pl-6 sm:pl-8 border-l-2 border-slate-200 dark:border-white/10' : 'glass border border-slate-200 dark:border-white/5 rounded-2xl p-6'}" data-comment-id="${comment.id}">
         <!-- 评论头部 -->
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center space-x-3">
@@ -173,24 +216,24 @@ try {
             </div>
             <div class="flex flex-col">
               <div class="flex items-center gap-2">
-                <span class="font-display font-bold text-white">${escapeHtml(comment.nickname)}</span>
+                <span class="font-display font-bold text-slate-900 dark:text-white">${escapeHtml(comment.nickname)}</span>
                 ${comment.replyToNickname ? `<span class="text-xs text-zinc-500 font-mono">REPLYING TO <span class="text-primary">@${escapeHtml(comment.replyToNickname)}</span></span>` : ''}
               </div>
               ${comment.email ? `<span class="text-[10px] text-zinc-600 font-mono uppercase">${maskEmail(comment.email)}</span>` : ''}
             </div>
           </div>
-          <time class="text-xs text-zinc-500 font-mono bg-white/5 px-2 py-1 rounded">${formatRelativeTime(comment.createTime)}</time>
+          <time class="text-xs text-slate-500 dark:text-zinc-500 font-mono bg-slate-100 dark:bg-white/5 px-2 py-1 rounded">${formatRelativeTime(comment.createTime)}</time>
         </div>
 
         <!-- 评论内容 -->
-        <div class="text-zinc-300 mb-4 leading-relaxed font-light">
+        <div class="text-slate-700 dark:text-zinc-300 mb-4 leading-relaxed font-light">
           ${escapeHtml(comment.content)}
         </div>
 
         <!-- 操作按钮 -->
         ${showReplyButton ? `
           <button
-            class="reply-btn text-xs text-zinc-500 hover:text-primary transition-colors flex items-center font-mono hover-trigger"
+            class="reply-btn text-xs text-slate-500 dark:text-zinc-500 hover:text-primary transition-colors flex items-center font-mono hover-trigger"
             data-comment-id="${comment.id}"
             data-nickname="${escapeHtml(comment.nickname)}"
           >
@@ -260,25 +303,16 @@ try {
 
       currentPage = page;
 
-      // 绑定事件
-      bindCommentEvents();
     } catch (error) {
       console.error('Failed to load comments:', error);
       showError('System error: Failed to fetch threads.');
     }
   }
 
-  // 绑定评论交互事件
-  function bindCommentEvents() {
-    // 回复按钮事件
-    document.querySelectorAll('.reply-btn').forEach(btn => {
-      btn.addEventListener('click', handleReplyClick);
-    });
-  }
-
   // 处理回复点击
   function handleReplyClick(event) {
-    const btn = event.currentTarget;
+    const btn = event.target?.closest?.('.reply-btn');
+    if (!btn) return;
     const commentId = parseInt(btn.dataset.commentId || '0');
     const nickname = btn.dataset.nickname || '';
     const container = document.querySelector(`.reply-form-container[data-comment-id="${commentId}"]`);
@@ -300,24 +334,24 @@ try {
 
     // 显示回复框
     container.innerHTML = `
-      <div class="bg-black/30 border border-white/5 rounded-xl p-4">
-        <div class="text-xs text-zinc-500 font-mono mb-3">REPLYING TO @${nickname}</div>
+      <div class="bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/5 rounded-xl p-4">
+        <div class="text-xs text-slate-500 dark:text-zinc-500 font-mono mb-3">REPLYING TO @${nickname}</div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 font-mono text-xs">
           <input
             type="text"
-            class="reply-nickname px-4 py-2 bg-surface/50 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-white placeholder:text-zinc-600 transition-colors hover-trigger"
+            class="reply-nickname px-4 py-2 bg-white/80 dark:bg-surface/50 border border-slate-300 dark:border-white/10 rounded-lg focus:outline-none focus:border-primary text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-600 transition-colors hover-trigger"
             placeholder="USER_ALIAS (REQUIRED)"
             maxlength="50"
           />
           <input
             type="email"
-            class="reply-email px-4 py-2 bg-surface/50 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-white placeholder:text-zinc-600 transition-colors hover-trigger"
+            class="reply-email px-4 py-2 bg-white/80 dark:bg-surface/50 border border-slate-300 dark:border-white/10 rounded-lg focus:outline-none focus:border-primary text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-600 transition-colors hover-trigger"
             placeholder="SECURE_EMAIL (REQUIRED)"
             maxlength="100"
           />
         </div>
         <textarea
-          class="reply-content w-full px-4 py-3 bg-surface/50 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-white placeholder:text-zinc-600 resize-none font-mono text-sm transition-colors hover-trigger"
+          class="reply-content w-full px-4 py-3 bg-white/80 dark:bg-surface/50 border border-slate-300 dark:border-white/10 rounded-lg focus:outline-none focus:border-primary text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-600 resize-none font-mono text-sm transition-colors hover-trigger"
           placeholder="INITIALIZE REPLY TRANSMISSION..."
           rows="3"
           maxlength="500"
@@ -325,10 +359,10 @@ try {
         <div class="flex justify-between items-center mt-3">
           <span class="text-[10px] text-zinc-600 font-mono reply-char-count">0/500 BYTES</span>
           <div class="flex space-x-2">
-            <button class="cancel-reply-btn px-4 py-1.5 bg-white/5 text-zinc-400 font-mono text-xs rounded-lg hover:bg-white/10 hover:text-white transition-colors hover-trigger">
+            <button class="cancel-reply-btn px-4 py-1.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-zinc-400 font-mono text-xs rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-colors hover-trigger">
               ABORT
             </button>
-            <button class="submit-reply-btn px-4 py-1.5 bg-white/10 text-white font-mono font-bold text-xs rounded-lg hover:bg-primary hover:text-black transition-colors hover-trigger" data-comment-id="${commentId}">
+            <button class="submit-reply-btn px-4 py-1.5 bg-slate-900 text-white dark:bg-white/10 dark:text-white font-mono font-bold text-xs rounded-lg hover:bg-primary hover:text-white dark:hover:text-black disabled:cursor-not-allowed disabled:opacity-60 transition-colors hover-trigger" data-comment-id="${commentId}">
               TRANSMIT
             </button>
           </div>
@@ -361,12 +395,12 @@ try {
     submitBtn?.addEventListener('click', () => {
       const replyNickname = container.querySelector('.reply-nickname')?.value?.trim();
       const replyEmail = container.querySelector('.reply-email')?.value?.trim();
-      submitReply(commentId, replyContent?.value || '', replyNickname, replyEmail);
+      submitReply(commentId, replyContent?.value || '', replyNickname, replyEmail, submitBtn);
     });
   }
 
   // 发表回复
-  async function submitReply(parentCommentId, content, nickname, email) {
+  async function submitReply(parentCommentId, content, nickname, email, submitBtn) {
     const commentSection = document.getElementById('comment-section');
     const articleId = parseInt(commentSection?.getAttribute('data-article-id') || '0');
     if (!articleId) return;
@@ -380,6 +414,11 @@ try {
       showError('Transmission content cannot be empty.');
       return;
     }
+
+    const submissionKey = String(parentCommentId);
+    if (pendingReplySubmissions.has(submissionKey)) return;
+    pendingReplySubmissions.add(submissionKey);
+    setElementSubmitting(submitBtn, true);
 
     try {
       const data = {
@@ -404,11 +443,16 @@ try {
     } catch (error) {
       console.error('Failed to submit reply:', error);
       showError('Transmission failed. Retry requested.');
+    } finally {
+      pendingReplySubmissions.delete(submissionKey);
+      setElementSubmitting(submitBtn, false);
     }
   }
 
   // 发表评论
   async function submitComment() {
+    if (isSubmittingComment) return;
+
     const commentSection = document.getElementById('comment-section');
     const articleId = parseInt(commentSection?.getAttribute('data-article-id') || '0');
     if (!articleId) return;
@@ -416,6 +460,7 @@ try {
     const contentInput = document.getElementById('comment-content');
     const nicknameInput = document.getElementById('guest-nickname');
     const emailInput = document.getElementById('guest-email');
+    const submitBtn = document.getElementById('submit-comment-btn');
 
     const content = contentInput?.value?.trim();
     const nickname = nicknameInput?.value?.trim();
@@ -435,6 +480,9 @@ try {
       showError('Transmission content cannot be empty.');
       return;
     }
+
+    isSubmittingComment = true;
+    setElementSubmitting(submitBtn, true);
 
     try {
       const data = {
@@ -460,6 +508,9 @@ try {
     } catch (error) {
       console.error('Failed to submit comment:', error);
       showError('Transmission failed. Retry requested.');
+    } finally {
+      isSubmittingComment = false;
+      setElementSubmitting(submitBtn, false);
     }
   }
 
@@ -497,6 +548,14 @@ try {
     loadMoreBtn?.addEventListener('click', () => {
       if (hasMore) {
         loadComments(currentPage + 1);
+      }
+    });
+
+    // 使用事件委托,避免加载更多后对旧回复按钮重复绑定
+    const commentsList = document.getElementById('comments-list');
+    commentsList?.addEventListener('click', (event) => {
+      if (event.target?.closest?.('.reply-btn')) {
+        handleReplyClick(event);
       }
     });
   });

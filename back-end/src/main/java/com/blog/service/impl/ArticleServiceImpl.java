@@ -70,8 +70,13 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleVO getArticleById(Long id) {
+        return getArticleById(id, true);
+    }
+
+    @Override
+    public ArticleVO getArticleById(Long id, boolean includeUnpublished) {
         ArticleVO articleVO = articleMapper.selectArticleById(id);
-        if (articleVO == null) {
+        if (articleVO == null || (!includeUnpublished && !Constants.ARTICLE_STATUS_PUBLISHED.equals(articleVO.getStatus()))) {
             throw new BusinessException("文章不存在");
         }
 

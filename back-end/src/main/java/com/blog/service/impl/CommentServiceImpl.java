@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -44,6 +46,10 @@ public class CommentServiceImpl implements CommentService {
      * 邮箱脱敏正则表达式
      */
     private static final Pattern EMAIL_MASK_PATTERN = Pattern.compile("(?<=.{1}).(?=.*@)");
+
+    private static final ZoneId APP_ZONE = ZoneId.of("Asia/Shanghai");
+
+    private static final long DUPLICATE_WINDOW_SECONDS = 30;
 
     @Override
     public PageResult<CommentVO> getCommentsByArticleId(Long articleId, Long current, Long size) {
@@ -162,6 +168,21 @@ public class CommentServiceImpl implements CommentService {
             throw new BusinessException("评论参数错误");
         }
 
+        LocalDateTime now = LocalDateTime.now(APP_ZONE);
+        Long duplicateId = commentMapper.selectRecentDuplicateCommentId(
+                commentDTO.getArticleId(),
+                parentId,
+                replyToId,
+                nickname,
+                email,
+                content,
+                now.minusSeconds(DUPLICATE_WINDOW_SECONDS)
+        );
+        if (duplicateId != null) {
+            log.info("检测到重复评论提交,返回已有评论: id={}, articleId={}, nickname={}", duplicateId, commentDTO.getArticleId(), nickname);
+            return duplicateId;
+        }
+
         // 5. 创建评论实体
         Comment comment = new Comment();
         comment.setArticleId(commentDTO.getArticleId());
@@ -172,6 +193,8 @@ public class CommentServiceImpl implements CommentService {
         comment.setContent(content);
         comment.setStatus(Constants.COMMENT_STATUS_PUBLISHED); // 默认直接发布
         comment.setDeleted(0);
+        comment.setCreateTime(now);
+        comment.setUpdateTime(now);
 
         // 6. 保存评论
         commentMapper.insert(comment);

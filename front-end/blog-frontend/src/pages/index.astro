@@ -36,7 +36,7 @@ async function fetchWithRetry<T>(fn: () => Promise<T>, retries = 2, delay = 500)
 
 try {
   const [articlesRes, categoriesRes] = await Promise.all([
-    fetchWithRetry(() => articleApi.getList({ current: page, size: pageSize, categoryId })),
+    fetchWithRetry(() => articleApi.getList({ current: page, size: pageSize, categoryId, status: 1 })),
     fetchWithRetry(() => categoryApi.getList())
   ]);
   articles = articlesRes.data.records || [];

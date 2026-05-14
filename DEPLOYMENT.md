@@ -258,10 +258,15 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 
-    # 后台管理 (blog-admin)
-    location /admin {
-        alias /var/www/blog/admin;
-        try_files $uri $uri/ /index.html;
+    # 后台管理 (blog-admin) — 精确匹配重定向尾随斜杠
+    location = /admin {
+        return 301 /admin/;
+    }
+
+    location /admin/ {
+        alias /var/www/blog/admin/;
+        index index.html;
+        try_files $uri $uri/ /admin/index.html;
     }
 
     # 管理端 (manager-end)
@@ -270,9 +275,73 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
-    # API 代理到后端
+    # ===================================================================
+    # Pulse 项目 (AI 社区)
+    # ===================================================================
+
+    # 精确匹配: /pulse → /pulse/ (防止 404)
+    location = /pulse {
+        return 301 /pulse/;
+    }
+
+    location /pulse/ {
+        alias /var/www/pulse/;
+        index index.html;
+        try_files $uri $uri/ /pulse/index.html;
+    }
+
+    location /pulse/assets/ {
+        alias /var/www/pulse/assets/;
+        expires 7d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location /pulse/api/ {
+        proxy_pass http://149.13.91.133:8080/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+
+    # ===================================================================
+    # Environment 项目 (环境监测)
+    # ===================================================================
+
+    # 精确匹配: /environment → /environment/ (防止 404)
+    location = /environment {
+        return 301 /environment/;
+    }
+
+    location /environment/ {
+        alias /var/www/environment/;
+        index index.html;
+        try_files $uri $uri/ /environment/index.html;
+    }
+
+    location /environment/assets/ {
+        alias /var/www/environment/assets/;
+        expires 7d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location /environment/api/ {
+        proxy_pass http://149.13.91.133:8083/environment/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+
+    # ===================================================================
+    # API 代理到 Qiniuyun 后端
+    # ===================================================================
+
+    # 博客 API (blog-backend, port 8081)
     location /api {
-        proxy_pass http://127.0.0.1:8080;
+        proxy_pass http://149.13.91.133:8081;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -280,9 +349,28 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # 上传文件访问
+    # 上传文件 — 本地静态文件
     location /uploads {
         alias /var/www/blog/uploads;
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+
+    # ===================================================================
+    # HTTPS (通过 certbot 自动配置)
+    # ===================================================================
+    listen 443 ssl;
+    ssl_certificate     /etc/letsencrypt/live/www.lililiz.top/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/www.lililiz.top/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
+
+# HTTP → HTTPS 重定向
+server {
+    listen 80 default_server;
+    location / {
+        return 301 https://$host$request_uri;
     }
 }
 ```
