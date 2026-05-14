@@ -78,6 +78,23 @@
           AND deleted = 0
     </select>
 
+    <!-- 查询短时间内完全相同的评论,用于防止重复提交 -->
+    <select id="selectRecentDuplicateCommentId" resultType="java.lang.Long">
+        SELECT id
+        FROM t_comment
+        WHERE article_id = #{articleId}
+          AND ((#{parentId} IS NULL AND parent_id IS NULL) OR parent_id = #{parentId})
+          AND ((#{replyToId} IS NULL AND reply_to_id IS NULL) OR reply_to_id = #{replyToId})
+          AND nickname = #{nickname}
+          AND email = #{email}
+          AND content = #{content}
+          AND status = 1
+          AND deleted = 0
+          AND create_time >= #{since}
+        ORDER BY create_time DESC
+        LIMIT 1
+    </select>
+
     <!-- 根据父评论ID删除所有子评论(逻辑删除) -->
     <update id="deleteByParentId">
         UPDATE t_comment

@@ -1,10 +1,9 @@
 // API 基础配置
-// SSR 模式下服务端需要直接请求后端，浏览器端通过 Nginx 代理
-const API_BASE_URL = import.meta.env.API_BASE_URL || (
-  typeof window === 'undefined'
-    ? 'http://127.0.0.1:8080/api/v1'  // SSR 服务端直接请求后端
-    : '/api/v1'  // 浏览器端通过 Nginx 代理转发
-);
+// SSR 模式: 服务端直接请求后端 (通过 PUBLIC_API_BASE_URL 环境变量或默认值)
+// 浏览器模式: 通过 Nginx 代理转发请求
+const API_BASE_URL = typeof window === 'undefined'
+  ? (import.meta.env.PUBLIC_API_BASE_URL || 'http://your_backend_ip:8081/api/v1')
+  : '/api/v1';
 
 // 统一响应结构
 interface ApiResponse<T> {
@@ -94,12 +93,14 @@ export const articleApi = {
     size?: number;
     categoryId?: number;
     keyword?: string;
+    status?: number;
   } = {}) => {
     const searchParams = new URLSearchParams();
     if (params.current) searchParams.set('current', String(params.current));
     if (params.size) searchParams.set('size', String(params.size));
     if (params.categoryId) searchParams.set('categoryId', String(params.categoryId));
     if (params.keyword) searchParams.set('keyword', params.keyword);
+    if (params.status !== undefined) searchParams.set('status', String(params.status));
 
     const queryString = searchParams.toString();
     return request<PageResponse<Article>>(`/articles${queryString ? `?${queryString}` : ''}`);
@@ -112,7 +113,7 @@ export const articleApi = {
 
   // 搜索文章
   search: (keyword: string, current: number = 1, size: number = 10) => {
-    return request<PageResponse<Article>>(`/articles?keyword=${encodeURIComponent(keyword)}&current=${current}&size=${size}`);
+    return request<PageResponse<Article>>(`/articles?keyword=${encodeURIComponent(keyword)}&current=${current}&size=${size}&status=1`);
   },
 };
 
@@ -173,7 +174,7 @@ export const commentApi = {
 
   // 发表评论
   createComment: (data: CreateCommentRequest) => {
-    return request<Comment>('/comments', {
+    return request<number>('/comments', {
       method: 'POST',
       body: JSON.stringify(data),
     });

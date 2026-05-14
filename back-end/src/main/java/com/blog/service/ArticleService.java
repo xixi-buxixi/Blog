@@ -31,6 +31,15 @@ public interface ArticleService {
     ArticleVO getArticleById(Long id);
 
     /**
+     * 查询文章详情
+     *
+     * @param id                 文章ID
+     * @param includeUnpublished 是否允许返回未发布文章
+     * @return 文章详情
+     */
+    ArticleVO getArticleById(Long id, boolean includeUnpublished);
+
+    /**
      * 创建文章
      *
      * @param articleDTO 文章DTO

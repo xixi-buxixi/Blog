@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"D:/My/Java/project/Blog/front-end/blog-frontend/public/images\")",
+      "Bash(mkdir -p \"D:/My/Java/project/Blog/front-end/blog-frontend/src/components\")",
+      "Bash(mkdir -p \"D:/My/Java/project/Blog/front-end/blog-frontend/src/layouts\")",
+      "Bash(mkdir -p \"D:/My/Java/project/Blog/front-end/blog-frontend/src/pages/article\")",
+      "Bash(mkdir -p \"D:/My/Java/project/Blog/front-end/blog-frontend/src/pages/category\")",
+      "Bash(find D:/My/Java/project/Blog/front-end -type f -name *.ts -o -name *.tsx -o -name *.astro -o -name *.css -o -name *.json -o -name *.js)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm list:*)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "Bash(npm uninstall:*)",
+      "Bash(curl -s http://localhost:8080/api/v1/articles/stats)",
+      "Bash(mvn clean:*)",
+      "Bash(npm run:*)",
+      "Bash(ls -la \"D:/My/Java/project/Blog/back-end/target/\"*.jar)",
+      "Bash(ssh:*)",
+      "Bash(scp:*)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' http://your_server_ip/)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' http://your_server_ip/admin/)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' http://your_server_ip/manager/)",
+      "Bash(curl -s http://your_server_ip/api/v1/categories)",
+      "Bash(API_BASE_URL=http://127.0.0.1:8080/api/v1 npm run build)",
+      "Bash(curl -s http://your_server_ip/)",
+      "Bash(curl:*)",
+      "Bash(nslookup www.lililiz.top)"
+    ]
+  }
+}

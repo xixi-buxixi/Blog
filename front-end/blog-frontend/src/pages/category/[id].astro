@@ -26,7 +26,7 @@ let selectedCategory: Category | null = null;
 try {
   const [categoriesRes, articlesRes] = await Promise.all([
     categoryApi.getList(),
-    categoryId ? articleApi.getList({ page, pageSize, categoryId }) : { data: { records: [], total: 0, current: 1, size: 10, pages: 1 } }
+    categoryId ? articleApi.getList({ current: page, size: pageSize, categoryId, status: 1 }) : { data: { records: [], total: 0, current: 1, size: 10, pages: 1 } }
   ]);
   categories = categoriesRes.data;
   articles = articlesRes.data.records;

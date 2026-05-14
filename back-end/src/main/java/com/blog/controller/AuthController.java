@@ -3,7 +3,9 @@ package com.blog.controller;
 import cn.hutool.crypto.digest.BCrypt;
 import com.blog.common.Result;
 import com.blog.dto.LoginDTO;
+import com.blog.entity.User;
 import com.blog.service.UserService;
+import com.blog.util.UserContext;
 import com.blog.vo.LoginVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,6 +58,31 @@ public class AuthController {
     public Result<Void> logout() {
         // JWT无状态，登出由前端删除Token即可
         return Result.success();
+    }
+
+    /**
+     * 获取当前登录用户信息
+     */
+    @GetMapping("/info")
+    @Operation(summary = "获取当前登录用户信息")
+    public Result<LoginVO.UserInfo> info() {
+        Long userId = UserContext.getUserId();
+        if (userId == null) {
+            return Result.error(401, "未授权，请先登录");
+        }
+
+        User user = userService.getById(userId);
+        if (user == null) {
+            return Result.error(404, "用户不存在");
+        }
+
+        LoginVO.UserInfo userInfo = new LoginVO.UserInfo();
+        userInfo.setId(user.getId());
+        userInfo.setUsername(user.getUsername());
+        userInfo.setNickname(user.getNickname());
+        userInfo.setAvatar(user.getAvatar());
+        userInfo.setRole(user.getRole());
+        return Result.success(userInfo);
     }
 
 }

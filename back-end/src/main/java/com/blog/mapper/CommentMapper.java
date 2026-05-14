@@ -6,6 +6,7 @@ import com.blog.vo.CommentVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -53,6 +54,19 @@ public interface CommentMapper extends BaseMapper<Comment> {
      * @return 顶级评论数量
      */
     Long countTopCommentsByArticleId(@Param("articleId") Long articleId);
+
+    /**
+     * 查询短时间内完全相同的评论,用于防止网络波动或重复点击造成重复提交
+     */
+    Long selectRecentDuplicateCommentId(
+            @Param("articleId") Long articleId,
+            @Param("parentId") Long parentId,
+            @Param("replyToId") Long replyToId,
+            @Param("nickname") String nickname,
+            @Param("email") String email,
+            @Param("content") String content,
+            @Param("since") LocalDateTime since
+    );
 
     /**
      * 根据父评论ID删除所有子评论(逻辑删除)
