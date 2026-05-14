@@ -1,9 +1,10 @@
 // API 基础配置
-// SSR 模式: 服务端直接请求后端 (通过 PUBLIC_API_BASE_URL 环境变量或默认值)
-// 浏览器模式: 通过 Nginx 代理转发请求
-const API_BASE_URL = typeof window === 'undefined'
-  ? (import.meta.env.PUBLIC_API_BASE_URL || 'http://149.13.91.133:8081/api/v1')
-  : '/api/v1';
+// SSR 模式下服务端通过 Nginx 80 端口代理到后端 8081，浏览器端通过 Nginx 443 代理
+const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || (
+  typeof window === 'undefined'
+    ? 'http://127.0.0.1/api/v1'  // SSR 服务端 → Nginx 80 → 后端 8081
+    : '/api/v1'  // 浏览器端 → Nginx 443 → 后端 8081
+);
 
 // 统一响应结构
 interface ApiResponse<T> {
