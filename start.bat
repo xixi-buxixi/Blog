@@ -20,8 +20,8 @@ ssh Tencent "pm2 status"
 
 echo.
 echo 访问地址：
-echo   博客首页: http://your_server_ip/
-echo   后台管理: http://your_server_ip/admin/
-echo   管理端:   http://your_server_ip/manager/
+echo   博客首页: http://your-server-ip/
+echo   后台管理: http://your-server-ip/admin/
+echo   管理端:   http://your-server-ip/manager/
 echo ========================================
 pause

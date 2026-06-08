@@ -35,7 +35,7 @@ mybatis-plus:
 
 # JWT配置
 jwt:
-  secret: your_jwt_secret
+  secret: ${JWT_SECRET:your_jwt_secret}
   expiration: 86400000
   header: Authorization
   prefix: Bearer
